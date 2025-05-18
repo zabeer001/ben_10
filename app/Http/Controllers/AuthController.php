@@ -55,6 +55,7 @@ class AuthController extends Controller
     // Login user and get token
     public function login(Request $request)
     {
+        // return $request;
         try {
             $validator = Validator::make($request->all(), [
                 'email' => 'required|email',
@@ -68,6 +69,8 @@ class AuthController extends Controller
                     'errors' => $validator->errors()
                 ], 400);
             }
+
+            // return 'validated';
 
             $credentials = $request->only('email', 'password');
 
