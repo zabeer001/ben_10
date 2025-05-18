@@ -180,30 +180,6 @@ class CategoryController extends Controller
     }
 
 
-
-    // public function statusUpdate(Request $request, $id)
-    // {
-    //     // dd($request);
-    //     // Validate the incoming status
-    //     $request->validate([
-    //         'status' => 'required|string' // Adjust allowed values as needed
-    //     ]);
-
-    //     // Find the category by ID
-    //     $category = Category::findOrFail($id);
-
-    //     // Update the status
-    //     $category->status = $request->input('status');
-    //     $category->save();
-
-    //     // Return a success response
-    //     return response()->json([
-    //         'success'=>true,
-    //         'message' => 'Category status updated successfully',
-    //         'category' => $category
-    //     ], 200);
-    // }
-
     public function statusUpdate(Request $request, $id)
     {
         try {

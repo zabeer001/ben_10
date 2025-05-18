@@ -1,27 +1,15 @@
 <?php
-
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Category extends Model
 {
-    use HasFactory;
+    protected $fillable = ['name']; // adjust fields as needed
 
-    protected $fillable = [
-        'name',
-        'description',
-        'status',
-    ];
-
-    /**
-     * The tiles that belong to the category.
-     */
-    public function tiles()
+    public function vehicleModels(): HasMany
     {
-        return $this->belongsToMany(Tile::class, 'category_tiles', 'category_id', 'tile_id')
-            ->withPivot('priority')
-            ->withTimestamps();
+        return $this->hasMany(VehicleModel::class);
     }
 }

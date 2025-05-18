@@ -28,22 +28,10 @@ Route::post('password/reset', [ResetPasswordController::class, 'reset'])->name('
 
 //categories
 Route::apiResource('categories', CategoryController::class);
-Route::put('categories/status/{id}', [CategoryController::class, 'statusUpdate']);
+// Route::put('categories/status/{id}', [CategoryController::class, 'statusUpdate']);
 
 
 //colors
 Route::apiResource('colors', ColorController::class);
-Route::put('colors/status/{id}', [ColorController::class, 'statusUpdate']);
+// Route::put('colors/status/{id}', [ColorController::class, 'statusUpdate']);
 
-// tiles
-Route::apiResource('tiles', TileController::class);
-Route::put('tiles/status/{id}', [TileController::class, 'statusUpdate']);
-
-
-//orders
-Route::apiResource('orders', OrderController::class);
-Route::put('orders/status/{id}', [OrderController::class, 'statusUpdate']);
-
-Route::post('tile-select/{id}', [TileController::class, 'tileSelect']);
-
-Route::post('/send-cloud-mail', [TilesEmailController::class, 'sendMailWithCloudFile']);
