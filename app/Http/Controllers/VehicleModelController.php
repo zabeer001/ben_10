@@ -36,12 +36,11 @@ class VehicleModelController extends Controller
         $paginate_count = $validated['paginate_count'] ?? 10;
         $search = $validated['search'] ?? null;
         $category = $validated['category'] ?? null;
-        $color = $validated['color'] ?? null;
         $status = $validated['status'] ?? null;
 
         try {
             // Build the query
-            $query = VehicleModel::with(['categories', 'colors']);
+            $query = VehicleModel::with(['categories']);
 
             // Apply search filter
             if ($search) {
@@ -55,12 +54,7 @@ class VehicleModelController extends Controller
                 });
             }
 
-            // Apply color filter
-            if ($color) {
-                $query->whereHas('colors', function ($q) use ($color) {
-                    $q->where('name', $color);
-                });
-            }
+           
 
             if ($status) {
                 $query->where('status', 'like', $status . '%');
@@ -130,8 +124,8 @@ class VehicleModelController extends Controller
         try {
             // Handle image upload if present
             $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('image'));
+            if ($request->hasFile('inner_image')) {
+                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
             }
 
             // Create a new tile
@@ -187,20 +181,21 @@ class VehicleModelController extends Controller
      */
     public function update(Request $request, $id)
     {
+
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'sleep_person' => 'required|numeric',
             'description' => 'required|string',
             'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-            'category_id' => 'required|array',
-            'category_id.*' => 'exists:categories,id',
+            'category_id' => 'required',
             'price' => 'nullable|numeric|min:0',
             'base_price' => 'required|numeric|min:0',
         ]);
-
+        //  return 'ok';
         try {
             $vehicleModel = VehicleModel::findOrFail($id); // Find model or fail
+            return $vehicleModel;
 
             // Handle image upload if present
             if ($request->hasFile('inner_image')) {
