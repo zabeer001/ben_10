@@ -7,6 +7,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\TileController;
 use App\Http\Controllers\TilesEmailController;
+use App\Http\Controllers\VehicleModelController;
 use Illuminate\Support\Facades\Route;
 
 // Auth routes
@@ -35,3 +36,4 @@ Route::apiResource('categories', CategoryController::class);
 Route::apiResource('colors', ColorController::class);
 // Route::put('colors/status/{id}', [ColorController::class, 'statusUpdate']);
 
+Route::apiResource('models', VehicleModelController::class);

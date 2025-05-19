@@ -13,10 +13,12 @@ return new class extends Migration {
         Schema::create('vehicle_models', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('sleep_person');
+            $table->integer('sleep_person');
             $table->string('description');
             $table->string('inner_image');
-            $table->foreignId('category_id')->constrained()->onDelete('cascade'); 
+            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->decimal('base_price', 10, 2); // Base price with 2 decimal places
+            $table->decimal('price', 10, 2);      // Current or rental price
             $table->timestamps();
         });
     }

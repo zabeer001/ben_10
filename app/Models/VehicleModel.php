@@ -13,6 +13,8 @@ class VehicleModel extends Model
         'description',
         'inner_image',
         'category_id',
+        'base_price',
+        'price',
     ];
 
     public function categories(): BelongsTo

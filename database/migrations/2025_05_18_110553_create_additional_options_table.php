@@ -10,11 +10,13 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('manufactural_options', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            // $table->longText('description')->nullable();
-            // $table->string('status')->default('published');
+            $table->decimal('price', 10, 2);      // Current or rental price
+            $table->foreignId('vehicle_model_id')->constrained()->onDelete('cascade');
+            $table->string('category_name');
+            $table->string('type');
             $table->timestamps();
         });
     }
@@ -24,6 +26,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('manufactural_options');
     }
 };

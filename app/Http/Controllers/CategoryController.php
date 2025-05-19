@@ -30,9 +30,7 @@ class CategoryController extends Controller
         $paginate_count = $validated['paginate_count'] ?? 10;
 
         try {
-            $query = DB::table('categories')
-                ->select('categories.*')
-                ->selectRaw('(SELECT COUNT(*) FROM category_tiles WHERE category_tiles.category_id = categories.id) as tiles_count');
+            $query = Category::query();
 
             if ($search) {
                 $query->where('name', 'like', $search . '%');
@@ -75,7 +73,7 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
+            // 'description' => 'nullable|string',
         ]);
 
         try {
@@ -121,8 +119,8 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'status' => 'nullable|string|max:255',
+            // 'description' => 'nullable|string',
+            // 'status' => 'nullable|string|max:255',
         ]);
 
         $category->update($request->all());

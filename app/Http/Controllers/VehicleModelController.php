@@ -115,20 +115,22 @@ class VehicleModelController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sleep_person' => 'required|string|max:255',
+            'sleep_person' => 'required|number|max:255',
             'description' => 'required|string',
-            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10 MB = 10240 KB
+            'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10 MB = 10240 KB
             'category_id' => 'required|array',
             'category_id.*' => 'exists:categories,id',
             // 'color_id' => 'nullable|array', // Added color_id validation
             // 'color_id.*' => 'exists:colors,id', // Ensure color_id exists in colors table
+            'price' => 'required|numeric|min:0',
+            'base_price' => 'required|numeric|min:0',
         ]);
 
         try {
             // Handle image upload if present
             $imagePath = null;
-            if ($request->hasFile('image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('image'));
+            if ($request->hasFile('inner_image')) {
+                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
             }
 
             // Create a new tile
@@ -136,7 +138,7 @@ class VehicleModelController extends Controller
                 'name' => $validated['name'],
                 'sleep_person' => $validated['sleep_person'],
                 'description' => $validated['description'],
-                'image_svg_text' => $validated['image_svg_text'],
+                // 'image_svg_text' => $validated['image_svg_text'],
                 'inner_image' => $imagePath,
                 'category_id' => $validated['category_id'], // set the relationship
             ]);
@@ -185,19 +187,21 @@ class VehicleModelController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sleep_person' => 'required|string|max:255',
+            'sleep_person' => 'required|numeric',
             'description' => 'required|string',
-            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'category_id' => 'required|array',
             'category_id.*' => 'exists:categories,id',
+            'price' => 'nullable|numeric|min:0',
+            'base_price' => 'required|numeric|min:0',
         ]);
 
         try {
             $vehicleModel = VehicleModel::findOrFail($id); // Find model or fail
 
             // Handle image upload if present
-            if ($request->hasFile('image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('image'));
+            if ($request->hasFile('inner_image')) {
+                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
                 $vehicleModel->inner_image = $imagePath;
             }
 
@@ -206,7 +210,8 @@ class VehicleModelController extends Controller
             $vehicleModel->sleep_person = $validated['sleep_person'];
             $vehicleModel->description = $validated['description'];
             $vehicleModel->category_id = $validated['category_id'];
-
+            $vehicleModel->price = $validated['price'];
+            $vehicleModel->base_price = $validated['base_price'];
             $vehicleModel->save();
 
             return $this->responseSuccess(
