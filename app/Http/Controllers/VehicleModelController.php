@@ -111,26 +111,27 @@ class VehicleModelController extends Controller
      */
     public function store(Request $request)
     {
+
         // dd($request);
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sleep_person' => 'required|number|max:255',
+            'sleep_person' => 'required|numeric',
             'description' => 'required|string',
             'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10 MB = 10240 KB
-            'category_id' => 'required|array',
-            'category_id.*' => 'exists:categories,id',
+            'category_id' => 'required',
             // 'color_id' => 'nullable|array', // Added color_id validation
             // 'color_id.*' => 'exists:colors,id', // Ensure color_id exists in colors table
             'price' => 'required|numeric|min:0',
             'base_price' => 'required|numeric|min:0',
         ]);
+        // return 'ok';
 
         try {
             // Handle image upload if present
             $imagePath = null;
-            if ($request->hasFile('inner_image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
+            if ($request->hasFile('image')) {
+                $imagePath = HelperMethods::uploadImage($request->file('image'));
             }
 
             // Create a new tile
@@ -141,6 +142,8 @@ class VehicleModelController extends Controller
                 // 'image_svg_text' => $validated['image_svg_text'],
                 'inner_image' => $imagePath,
                 'category_id' => $validated['category_id'], // set the relationship
+                'base_price' => $validated['base_price'],
+                'price' => $validated['price'],
             ]);
 
             // Sync relationships
@@ -149,12 +152,12 @@ class VehicleModelController extends Controller
 
             return $this->responseSuccess(
                 // $VehicleModel->load(['categories', 'colors']),
-                $VehicleModel->load('categories'),
-                'Tile created successfully',
+                $VehicleModel,
+                'VehicleModel created successfully',
                 201
             );
         } catch (\Exception $e) {
-            Log::error('Error creating tile: ' . $e->getMessage(), [
+            Log::error('Error creating VehicleModel: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
