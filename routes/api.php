@@ -8,6 +8,7 @@ use App\Http\Controllers\ForgetPassowrdController;
 use App\Http\Controllers\FrontendQueryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\ThemeController;
 use App\Http\Controllers\VehicleModelController;
 use Illuminate\Support\Facades\Route;
 
@@ -41,8 +42,11 @@ Route::apiResource('models', VehicleModelController::class);
 
 Route::apiResource('customers', CustomerInfoController::class);
 
-Route::apiResource('addtional-opstions', AdditionalOptionController::class);
+Route::apiResource('addtional-options', AdditionalOptionController::class);
 
 
 Route::get('frontend-models-category', [FrontendQueryController::class, 'frontendModelsCategory']);
+
+
+Route::apiResource('themes', ThemeController::class);
 
