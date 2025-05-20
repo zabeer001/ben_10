@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('sleep_person');
-            $table->string('description')->nullable();
+            $table->longText('description')->nullable();
             $table->string('inner_image')->nullable();;
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->decimal('base_price', 10, 2); // Base price with 2 decimal places

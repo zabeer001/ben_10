@@ -123,8 +123,8 @@ class VehicleModelController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sleep_person' => 'required|numeric',
-            'description' => 'required|string',
+            'sleep_person' => 'required|string',
+            'description' => 'required',
             'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10 MB = 10240 KB
             'category_id' => 'required',
             // 'color_id' => 'nullable|array', // Added color_id validation
@@ -198,8 +198,8 @@ class VehicleModelController extends Controller
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
-            'sleep_person' => 'required|numeric',
-            'description' => 'required|string',
+            'sleep_person' => 'required|string',
+            'description' => 'required',
             'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
             'category_id' => 'required',
             'price' => 'nullable|numeric|min:0',
