@@ -38,22 +38,21 @@ class HelperMethods
         }
     }
 
-    public static function updateImage(Request $request, $obj)
+    public static function updateImage($image, $oldImagePath = null)
     {
-        // Check if a new image is uploaded and delete the previous image if it exists
-        if ($request->hasFile('image')) {
-            // Delete the previous image if it exists
-            if ($obj->image && file_exists(public_path($obj->image))) {
-                unlink(public_path($obj->image)); // Delete the old image
+        if ($image && $image->isValid()) {
+            // Delete the old image if it exists
+            if ($oldImagePath && file_exists(public_path($oldImagePath))) {
+                unlink(public_path($oldImagePath));
             }
 
-            // Handle image upload using the helper function
-            return HelperMethods::uploadImage($request->file('image'));
+            // Upload and return the new image path
+            return self::uploadImage($image);
         }
 
-        // If no new image is uploaded, keep the old image
-        return $obj->image;
+        // Return the old image path if no new image is uploaded
+        return $oldImagePath;
     }
 
-    
+
 }

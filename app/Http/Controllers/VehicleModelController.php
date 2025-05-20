@@ -25,6 +25,7 @@ class VehicleModelController extends Controller
     {
         // Validate query parameters
         $validated = $request->validate([
+            'id' => 'nullable|integer|min:1',
             'paginate_count' => 'nullable|integer|min:1',
             'search' => 'nullable|string|max:255',
             'category' => 'nullable|string|exists:categories,name',
@@ -34,12 +35,24 @@ class VehicleModelController extends Controller
 
         // Get query parameters
         $paginate_count = $validated['paginate_count'] ?? 10;
+        $id = $validated['id'] ?? null;
         $search = $validated['search'] ?? null;
         $category = $validated['category'] ?? null;
         $status = $validated['status'] ?? null;
 
+        if ($id) {
+           $data = VehicleModel::with('categories')->find($id);
+            if ($data) {
+                return $data;
+            } else {
+                return response()->json(['message' => 'No data found'], 404);
+            }
+        }
         try {
             // Build the query
+
+
+
             $query = VehicleModel::with(['categories']);
 
             // Apply search filter
@@ -54,7 +67,7 @@ class VehicleModelController extends Controller
                 });
             }
 
-           
+
 
             if ($status) {
                 $query->where('status', 'like', $status . '%');
@@ -199,7 +212,7 @@ class VehicleModelController extends Controller
 
             // Handle image upload if present
             if ($request->hasFile('inner_image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
+                $imagePath = HelperMethods::updateImage($request->file('inner_image'));
                 $vehicleModel->inner_image = $imagePath;
             }
 

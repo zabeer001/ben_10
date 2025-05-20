@@ -1,12 +1,13 @@
 <?php
+use App\Http\Controllers\AdditionalOptionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\ColorController;
+use App\Http\Controllers\CustomerInfoController;
 use App\Http\Controllers\ForgetPassowrdController;
+use App\Http\Controllers\FrontendQueryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ResetPasswordController;
-use App\Http\Controllers\TileController;
-use App\Http\Controllers\TilesEmailController;
 use App\Http\Controllers\VehicleModelController;
 use Illuminate\Support\Facades\Route;
 
@@ -37,3 +38,11 @@ Route::apiResource('colors', ColorController::class);
 // Route::put('colors/status/{id}', [ColorController::class, 'statusUpdate']);
 
 Route::apiResource('models', VehicleModelController::class);
+
+Route::apiResource('customers', CustomerInfoController::class);
+
+Route::apiResource('addtional-opstions', AdditionalOptionController::class);
+
+
+Route::get('frontend-models-category', [FrontendQueryController::class, 'frontendModelsCategory']);
+

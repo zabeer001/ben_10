@@ -21,4 +21,9 @@ class VehicleModel extends Model
     {
         return $this->belongsTo(Category::class);
     }
+      // One vehicle model has many additional options
+    public function addtionalOptions()
+    {
+        return $this->hasMany(AdditionalOption::class);
+    }
 }
