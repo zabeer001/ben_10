@@ -28,9 +28,73 @@ class ThemeController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+      public function index(Request $request)
     {
-        //
+        // Validate query parameters
+        $validated = $request->validate([
+            'id' => 'nullable|integer|min:1',
+            'paginate_count' => 'nullable|integer|min:1',
+            'search' => 'nullable|string|max:255',
+            'category' => 'nullable|string|exists:categories,name',
+            'color' => 'nullable|string|exists:colors,name',
+            'status' => 'nullable|string|max:255',
+        ]);
+
+        // Get query parameters
+        $paginate_count = $validated['paginate_count'] ?? 10;
+        $id = $validated['id'] ?? null;
+        $search = $validated['search'] ?? null;
+
+
+        if ($id) {
+           $data = Theme::find($id);
+            if ($data) {
+                return $data;
+            } else {
+                return response()->json(['message' => 'No data found'], 404);
+            }
+        }
+        try {
+            // Build the query
+
+
+
+            $query = Theme::with(['categories']);
+
+            // Apply search filter
+            if ($search) {
+                $query->where('name', 'like', $search . '%');
+            }
+
+            // Paginate the result
+            $data = $query->paginate($paginate_count);
+
+            // Check if any data was returned
+            if ($data->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No VehicleModels found',
+                    'data' => [],
+                ], 404);
+            }
+
+            // Return with pagination meta
+            return response()->json([
+                'success' => true,
+                'message' => 'VehicleModels retrieved successfully',
+                'data' => $data,
+                'current_page' => $data->currentPage(),
+                'total_pages' => $data->lastPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch VehicleModels.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
