@@ -21,17 +21,22 @@ class ColorController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
+            'id' => 'nullable|integer',
             'paginate_count' => 'nullable|integer|min:1',
             'query' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
         ]);
-
+        $id = $validated['id'] ?? null;
         $paginate_count = $validated['paginate_count'] ?? 10;
         $query = $validated['query'] ?? null;
         $status = $validated['status'] ?? null;
 
+
         try {
-           
+            if ($id) {
+                $color = Color::find($id);
+                return $color;
+            }
 
             $colorQuery = Color::query();
 
@@ -41,7 +46,7 @@ class ColorController extends Controller
                         ->orWhere('code', 'like', $query . '%');
                 });
             }
-            
+
             if ($status) {
                 $colorQuery->where('status', 'like', $status . '%');
             }
@@ -130,6 +135,7 @@ class ColorController extends Controller
      */
     public function update(Request $request, $id)
     {
+        //  return $id;
         // Validate the incoming request
         $validated = $request->validate([
             'name' => 'required|string|max:255',
@@ -137,37 +143,39 @@ class ColorController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional
             'status' => 'nullable|string|max:255', // Status is optional
         ]);
-    
+
         try {
+            // return $id;
             // Find the existing color by ID
             $color = Color::findOrFail($id);
-    
+
+            //  return $color;
             // Prepare update data
             $updateData = [
                 'name' => $validated['name'],
             ];
-    
+
             // Only update code if provided, and set image to null
             if ($request->filled('code')) {
                 $updateData['code'] = $validated['code'];
                 $updateData['image'] = null;
             }
-    
+
             // Only update status if provided
             if ($request->filled('status')) {
                 $updateData['status'] = $validated['status'];
             }
-    
+
             // Handle image update (if provided), and set code to null
-            $imagePath = HelperMethods::updateImage($request, $color);
+            $imagePath = HelperMethods::updateImage($request->file('image'), $color->image);
             if ($imagePath) {
                 $updateData['image'] = $imagePath;
                 $updateData['code'] = null;
             }
-    
+
             // Update the color
             $color->update($updateData);
-    
+
             // Return success response
             return $this->responseSuccess($color, 'Color updated successfully', 200);
         } catch (\Exception $e) {
@@ -177,7 +185,7 @@ class ColorController extends Controller
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
-    
+
             // Return error response
             return $this->responseError('Failed to update color', $e->getMessage(), 500);
         }
@@ -217,14 +225,14 @@ class ColorController extends Controller
         $request->validate([
             'status' => 'required|string' // Adjust allowed values as needed
         ]);
-    
+
         // Find the category by ID
         $color = Color::findOrFail($id);
-    
+
         // Update the status
         $color->status = $request->input('status');
         $color->save();
-    
+
         // Return a success response
         return response()->json([
             'message' => 'Category status updated successfully',
