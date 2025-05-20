@@ -13,7 +13,7 @@ return new class extends Migration {
         Schema::create('vehicle_models', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->integer('sleep_person');
+            $table->string('sleep_person');
             $table->string('description')->nullable();
             $table->string('inner_image')->nullable();;
             $table->foreignId('category_id')->constrained()->onDelete('cascade');

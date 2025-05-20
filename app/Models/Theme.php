@@ -8,4 +8,9 @@ use Illuminate\Database\Eloquent\Model;
 class Theme extends Model
 {
     use HasFactory;
+
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 }

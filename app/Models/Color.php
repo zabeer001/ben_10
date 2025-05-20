@@ -15,10 +15,8 @@ class Color extends Model
         'status',
     ];
 
-    public function tiles()
+    public function order()
     {
-        return $this->belongsToMany(Tile::class, 'color_tiles', 'color_id', 'tile_id')
-            ->withPivot('priority')
-            ->withTimestamps();
+        return $this->belongsTo(Order::class);
     }
 }

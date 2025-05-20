@@ -26,4 +26,9 @@ class VehicleModel extends Model
     {
         return $this->hasMany(AdditionalOption::class);
     }
+
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 }

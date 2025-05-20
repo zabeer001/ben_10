@@ -10,13 +10,14 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create('additional_options', function (Blueprint $table) {
+        Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->decimal('price', 10, 2);      // Current or rental price
             $table->foreignId('vehicle_model_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('category_name');
-            $table->string('type');
+            $table->foreignId('theme_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('customer_info_id')->nullable()->constrained()->onDelete('cascade');
+            $table->string('phone');
+            $table->decimal('base_price', 10, 2); 
+            $table->decimal('total_price', 10, 2);
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('additional_options');
+        Schema::dropIfExists('orders');
     }
 };
