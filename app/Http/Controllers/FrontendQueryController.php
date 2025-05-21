@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AdditionalOption;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -27,9 +28,9 @@ class FrontendQueryController extends Controller
             //     ->join('vehicle_models as vm', 'vm.category_id', '=', 'c.id')
             //     ->groupBy('c.id', 'c.name')
             //     ->get();
-               $data = Category::with(['vehicleModels:id,category_id,name'])->get();
-                
-                return $data; 
+            $data = Category::with(['vehicleModels:id,category_id,name'])->get();
+
+            return $data;
 
             // Format the data: decode JSON models into arrays
             // $formatted = $data->map(function ($item) {
@@ -65,5 +66,33 @@ class FrontendQueryController extends Controller
             ], 500);
         }
     }
+
+
+    public function frontendAdditionalOptions(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'nullable|string', // Adjust with your actual type values
+        ]);
+
+        $type = $validated['type'] ?? null;
+
+        $query = AdditionalOption::query();
+
+        // Apply type filter if provided
+        if ($type) {
+             $query->where('type', 'like', $type . '%');
+        }
+
+        $additionalOptions = $query->get(); // Fixed variable name
+
+        // Group by category_name
+        $categoryWiseAdditionalOptions = $additionalOptions->groupBy('category_name');
+
+        return response()->json([
+            'success' => true,
+            'data' => $categoryWiseAdditionalOptions
+        ]);
+    }
+
 
 }

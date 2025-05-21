@@ -46,6 +46,7 @@ Route::apiResource('addtional-options', AdditionalOptionController::class);
 
 
 Route::get('frontend-models-category', [FrontendQueryController::class, 'frontendModelsCategory']);
+Route::get('frontend-additional-options', [FrontendQueryController::class, 'frontendAdditionalOptions']);
 
 
 Route::apiResource('themes', ThemeController::class);

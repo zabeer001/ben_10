@@ -11,13 +11,16 @@ class ThemeController extends Controller
 {
     protected array $typeOfFields = ['imageFields', 'textFields'];
 
-    
+
     protected array $imageFields = [
         'image',
         'flooring_image',
         'cabinetry_1_image',
         'table_top_1_image',
         'seating_1_image',
+        'cabinetry_2_image',
+        'table_top_2_image',
+        'seating_2_image',
     ];
 
     protected array $textFields = [
@@ -26,11 +29,14 @@ class ThemeController extends Controller
         'cabinetry_1_name',
         'table_top_1_name',
         'seating_1_name',
+        'cabinetry_2_name',
+        'table_top_2_name',
+        'seating_2_name',
     ];
     /**
      * Display a listing of the resource.
      */
-      public function index(Request $request)
+    public function index(Request $request)
     {
         // Validate query parameters
         $validated = $request->validate([
@@ -49,21 +55,21 @@ class ThemeController extends Controller
 
 
         if ($id) {
-           $data = Theme::find($id);
+            $data = Theme::find($id);
             if ($data) {
                 return $data;
             } else {
                 return response()->json(['message' => 'No data found'], 404);
             }
         }
-     
-   
+
+
         try {
             // Build the query
 
             $query = Theme::query();
 
-           
+
 
             // Apply search filter
             if ($search) {
@@ -114,40 +120,33 @@ class ThemeController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate the incoming request
         $validated = $this->validateRequest($request);
 
         try {
-            // Handle all image uploads
-            $imagePath = $request->hasFile('image') ? HelperMethods::uploadImage($request->file('image')) : null;
-            $flooringImagePath = $request->hasFile('flooring_image') ? HelperMethods::uploadImage($request->file('flooring_image')) : null;
-            $cabinetryImagePath = $request->hasFile('cabinetry_1_image') ? HelperMethods::uploadImage($request->file('cabinetry_1_image')) : null;
-            $tableTopImagePath = $request->hasFile('table_top_1_image') ? HelperMethods::uploadImage($request->file('table_top_1_image')) : null;
-            $seatingImagePath = $request->hasFile('seating_1_image') ? HelperMethods::uploadImage($request->file('seating_1_image')) : null;
+            $theme = new Theme();
 
-            // Create a new theme
-            $theme = Theme::create([
-                'name' => $validated['name'],
-                'image' => $imagePath,
+            // Use class properties here
+            foreach ($this->typeOfFields as $fieldType) {
+                foreach ($this->{$fieldType} as $field) {
+                    switch ($fieldType) {
+                        case 'imageFields':
+                            if ($request->hasFile($field)) {
+                                $theme->$field = HelperMethods::uploadImage($request->file($field));
+                            }
+                            break;
 
-                'flooring_name' => $validated['flooring_name'],
-                'flooring_image' => $flooringImagePath,
+                        case 'textFields':
+                            if (isset($validated[$field])) {
+                                $theme->$field = $validated[$field];
+                            }
+                            break;
+                    }
+                }
+            }
 
-                'cabinetry_1_name' => $validated['cabinetry_1_name'],
-                'cabinetry_1_image' => $cabinetryImagePath,
+            $theme->save();
 
-                'table_top_1_name' => $validated['table_top_1_name'],
-                'table_top_1_image' => $tableTopImagePath,
-
-                'seating_1_name' => $validated['seating_1_name'],
-                'seating_1_image' => $seatingImagePath,
-            ]);
-
-            return $this->responseSuccess(
-                $theme,
-                'Theme created successfully',
-                201
-            );
+            return $this->responseSuccess($theme, 'Theme created successfully', 201);
         } catch (\Exception $e) {
             Log::error('Error creating Theme: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -157,6 +156,7 @@ class ThemeController extends Controller
             return $this->responseError('Something went wrong', $e->getMessage(), 500);
         }
     }
+
 
 
     /**
@@ -238,17 +238,33 @@ class ThemeController extends Controller
             'name' => 'required|string|max:255',
             'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
 
+            // Flooring
             'flooring_name' => 'required|string|max:255',
             'flooring_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
 
+            // Cabinetry 1
             'cabinetry_1_name' => 'required|string|max:255',
             'cabinetry_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
 
+            // Cabinetry 2
+            'cabinetry_2_name' => 'required|string|max:255',
+            'cabinetry_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+
+            // Table Top 1
             'table_top_1_name' => 'required|string|max:255',
             'table_top_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
 
+            // Table Top 2
+            'table_top_2_name' => 'required|string|max:255',
+            'table_top_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+
+            // Seating 1
             'seating_1_name' => 'required|string|max:255',
             'seating_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+
+            // Seating 2
+            'seating_2_name' => 'required|string|max:255',
+            'seating_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
         ]);
     }
 }

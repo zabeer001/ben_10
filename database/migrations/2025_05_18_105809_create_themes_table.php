@@ -22,6 +22,13 @@ return new class extends Migration {
             $table->string('table_top_1_image');
             $table->string('seating_1_name');
             $table->string('seating_1_image');
+            
+            $table->string('seating_2_name');
+            $table->string('seating_2_image');
+            $table->string('cabinetry_2_name');
+            $table->string('cabinetry_2_image');
+            $table->string('table_top_2_name');
+            $table->string('table_top_2_image');
             $table->timestamps();
         });
     }
