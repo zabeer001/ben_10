@@ -106,7 +106,7 @@ class OrderController extends Controller
             // Start with a query builder without eager loading
             $query = Order::query();
 
-           
+
 
             // Apply status filter
             if ($status) {
@@ -216,10 +216,23 @@ class OrderController extends Controller
     // DELETE /orders/{id}
     public function destroy($id)
     {
-        $order = Order::findOrFail($id);
-        $order->delete();
+        try {
+            $order = Order::findOrFail($id);
 
-        return response()->json(['message' => 'Order deleted successfully']);
+            // Delete only the pivot records in additional_option_order
+            $order->additionalOptions()->detach();
+
+            // Delete the order
+            $order->delete();
+
+            return response()->json(['message' => 'Order deleted successfully'], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to delete order.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
 
