@@ -15,8 +15,8 @@ class Color extends Model
         'status',
     ];
 
-    public function order()
+    public function orders()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsToMany(Order::class);
     }
 }

@@ -16,73 +16,64 @@ class AdditionalOptionController extends Controller
         // Apply JWT authentication middleware only to store, update, and destroy methods
         $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'statusUpdate']);
     }
-     public function index(Request $request)
-    {
-        // Validate query parameters
-        $validated = $request->validate([
-            'paginate_count' => 'nullable|integer|min:1',
-            'search' => 'nullable|string|max:255',
-            'category' => 'nullable|string|exists:categories,name',
-            'type' => 'nullable|string|max:255',
-        ]);
+public function index(Request $request)
+{
+    $validated = $request->validate([
+        'paginate_count' => 'nullable|integer|min:1',
+        'search' => 'nullable|string|max:255',
+        'category' => 'nullable|string|exists:categories,name',
+        'type' => 'nullable|string|max:255',
+    ]);
 
-        // Get query parameters
-        $paginate_count = $validated['paginate_count'] ?? 10;
-        $search = $validated['search'] ?? null;
-        $category = $validated['category'] ?? null;
-        $type = $validated['type'] ?? null;
+    $paginate_count = $validated['paginate_count'] ?? 10;
+    $search = $validated['search'] ?? null;
+    $category = $validated['category'] ?? null;
+    $type = $validated['type'] ?? null;
 
-        try {
-            // Build the query
-            $query = AdditionalOption::all();
+    try {
+        // ✅ Use query builder
+        $query = AdditionalOption::query();
 
-            // Apply search filter
-            if ($search) {
-                $query->where('name', 'like', $search . '%');
-            }
+        if ($search) {
+            $query->where('name', 'like', $search . '%');
+        }
 
-            // Apply category filter
-            if ($category) {
-                   $query->where('category_name', 'like', $category . '%');
-            }
+        if ($category) {
+            $query->where('category_name', 'like', $category . '%');
+        }
 
-           
+        if ($type) {
+            $query->where('type', 'like', $type . '%');
+        }
 
-            if ($type) {
-                $query->where('type', 'like', $type . '%');
-            }
+        $AdditionalOptions = $query->paginate($paginate_count);
 
-
-            // Paginate the result
-            $AdditionalOptions = $query->paginate($paginate_count);
-
-            // Check if any data was returned
-            if ($AdditionalOptions->isEmpty()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'No AdditionalOptions found',
-                    'data' => [],
-                ], 404);
-            }
-
-            // Return with pagination meta
-            return response()->json([
-                'success' => true,
-                'message' => 'AdditionalOptions retrieved successfully',
-                'data' => $AdditionalOptions,
-                'current_page' => $AdditionalOptions->currentPage(),
-                'total_pages' => $AdditionalOptions->lastPage(),
-                'per_page' => $AdditionalOptions->perPage(),
-                'total' => $AdditionalOptions->total(),
-            ], 200);
-        } catch (\Exception $e) {
+        if ($AdditionalOptions->isEmpty()) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to fetch VehicleModels.',
-                'error' => $e->getMessage(),
-            ], 500);
+                'message' => 'No AdditionalOptions found',
+                'data' => [],
+            ], 404);
         }
+
+        return response()->json([
+            'success' => true,
+            'message' => 'AdditionalOptions retrieved successfully',
+            'data' => $AdditionalOptions,
+            'current_page' => $AdditionalOptions->currentPage(),
+            'total_pages' => $AdditionalOptions->lastPage(),
+            'per_page' => $AdditionalOptions->perPage(),
+            'total' => $AdditionalOptions->total(),
+        ], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Failed to fetch AdditionalOptions.',
+            'error' => $e->getMessage(),
+        ], 500);
     }
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -97,6 +88,7 @@ class AdditionalOptionController extends Controller
      */
     public function store(Request $request)
     {
+        // return 'ok';
         try {
             $validated = $request->validate([
                 'name' => 'required|string|max:255',

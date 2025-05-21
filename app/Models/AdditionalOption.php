@@ -19,10 +19,10 @@ class AdditionalOption extends Model
     ];
     public function vehicleModel()
     {
-        return $this->belongsTo(VehicleModel::class);
+        return $this->belongs(VehicleModel::class);
     }
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsToMany(Order::class);
     }
 }

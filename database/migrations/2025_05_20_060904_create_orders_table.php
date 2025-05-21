@@ -15,9 +15,9 @@ return new class extends Migration {
             $table->foreignId('vehicle_model_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('theme_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('customer_info_id')->nullable()->constrained()->onDelete('cascade');
-            $table->string('phone');
-            $table->decimal('base_price', 10, 2); 
+            $table->decimal('base_price', 10, 2);
             $table->decimal('total_price', 10, 2);
+            $table->string('status')->default('pending');
             $table->timestamps();
         });
     }

@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Log;
 class ThemeController extends Controller
 {
     protected array $typeOfFields = ['imageFields', 'textFields'];
+
+    
     protected array $imageFields = [
         'image',
         'flooring_image',
@@ -54,12 +56,14 @@ class ThemeController extends Controller
                 return response()->json(['message' => 'No data found'], 404);
             }
         }
+         $query = Theme::all();
+        return $query;
         try {
             // Build the query
 
 
 
-            $query = Theme::with(['categories']);
+           
 
             // Apply search filter
             if ($search) {
@@ -81,7 +85,7 @@ class ThemeController extends Controller
             // Return with pagination meta
             return response()->json([
                 'success' => true,
-                'message' => 'VehicleModels retrieved successfully',
+                'message' => 'Theme retrieved successfully',
                 'data' => $data,
                 'current_page' => $data->currentPage(),
                 'total_pages' => $data->lastPage(),

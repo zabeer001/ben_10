@@ -50,3 +50,5 @@ Route::get('frontend-models-category', [FrontendQueryController::class, 'fronten
 
 Route::apiResource('themes', ThemeController::class);
 
+Route::apiResource('orders', OrderController::class);
+

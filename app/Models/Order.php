@@ -9,16 +9,22 @@ class Order extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'vehicle_model_id',
+        'theme_id',
+        'base_price',
+        'total_price',
+    ];
 
-    public function additionalOption()
+
+    public function additionalOptions()
     {
-        return $this->belongsTo(AdditionalOption::class);
+        return $this->belongsToMany(AdditionalOption::class);
     }
 
-
-    public function color()
+    public function colors()
     {
-        return $this->belongsTo(Color::class);
+        return $this->belongsToMany(Color::class);
     }
 
     public function vehicleModel()
@@ -30,5 +36,10 @@ class Order extends Model
     public function theme()
     {
         return $this->belongsTo(Theme::class);
+    }
+
+     public function customerInfo()
+    {
+        return $this->belongsTo(CustomerInfo::class);
     }
 }
