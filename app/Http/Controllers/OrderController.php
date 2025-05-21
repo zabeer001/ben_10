@@ -106,15 +106,7 @@ class OrderController extends Controller
             // Start with a query builder without eager loading
             $query = Order::query();
 
-            // Apply search filter
-            if ($search) {
-                $query->where(function ($q) use ($search) {
-                    $q->where('order_number', 'like', '%' . $search . '%')
-                        ->orWhereHas('customerInfo', function ($q) use ($search) {
-                            $q->where('name', 'like', '%' . $search . '%');
-                        });
-                });
-            }
+           
 
             // Apply status filter
             if ($status) {

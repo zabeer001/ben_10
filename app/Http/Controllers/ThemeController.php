@@ -56,12 +56,12 @@ class ThemeController extends Controller
                 return response()->json(['message' => 'No data found'], 404);
             }
         }
-         $query = Theme::all();
-        return $query;
+     
+   
         try {
             // Build the query
 
-
+            $query = Theme::query();
 
            
 
