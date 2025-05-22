@@ -54,5 +54,24 @@ class HelperMethods
         return $oldImagePath;
     }
 
+    public static function deleteImage($oldImagePath)
+    {
+        try {
+            // Check if the image path exists and is not empty
+            if ($oldImagePath && file_exists(public_path($oldImagePath))) {
+                unlink(public_path($oldImagePath));
+                return true;
+            }
+
+            // Return true if no image to delete (no action needed)
+        } catch (\Exception $e) {
+            Log::error('Error deleting image: ' . $e->getMessage(), [
+                'image_path' => $oldImagePath,
+                'error' => $e->getTraceAsString(),
+            ]);
+            return false;
+        }
+    }
+
 
 }

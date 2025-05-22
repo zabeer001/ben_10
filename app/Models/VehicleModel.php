@@ -21,14 +21,24 @@ class VehicleModel extends Model
     {
         return $this->belongsTo(Category::class);
     }
-      // One vehicle model has many additional options
+    // One vehicle model has many additional options
     public function addtionalOptions()
     {
         return $this->hasMany(AdditionalOption::class);
     }
 
     public function orders()
-{
-    return $this->hasMany(Order::class);
-}
+    {
+        return $this->hasMany(Order::class);
+    }
+
+    public function modelThemeWiseImages()
+    {
+        return $this->hasMany(ModelThemeWiseImage::class);
+    }
+
+    public function modelColorWiseImages()
+    {
+        return $this->hasMany(ModelColorWiseImage::class, 'vehicle_model_id');
+    }
 }

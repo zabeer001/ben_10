@@ -3,35 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\HelperMethods;
-use App\Models\Theme;
+use App\Models\ModelColorWiseImage;
+use App\Models\ModelThemeWiseImage;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class ThemeController extends Controller
+class ModelThemeWiseImageController extends Controller
 {
+
     protected array $typeOfFields = ['imageFields', 'textFields'];
 
 
     protected array $imageFields = [
         'image',
-        'flooring_image',
-        'cabinetry_1_image',
-        'table_top_1_image',
-        'seating_1_image',
-        'cabinetry_2_image',
-        'table_top_2_image',
-        'seating_2_image',
     ];
 
     protected array $textFields = [
-        'name',
-        'flooring_name',
-        'cabinetry_1_name',
-        'table_top_1_name',
-        'seating_1_name',
-        'cabinetry_2_name',
-        'table_top_2_name',
-        'seating_2_name',
+        'vehicle_model_id',
+        'theme_id',
     ];
     /**
      * Display a listing of the resource.
@@ -43,8 +32,6 @@ class ThemeController extends Controller
             'id' => 'nullable|integer|min:1',
             'paginate_count' => 'nullable|integer|min:1',
             'search' => 'nullable|string|max:255',
-            'category' => 'nullable|string|exists:categories,name',
-            'color' => 'nullable|string|exists:colors,name',
             'status' => 'nullable|string|max:255',
         ]);
 
@@ -55,7 +42,7 @@ class ThemeController extends Controller
 
 
         if ($id) {
-            $data = Theme::find($id);
+            $data = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])::find($id);
             if ($data) {
                 return $data;
             } else {
@@ -67,7 +54,9 @@ class ThemeController extends Controller
         try {
             // Build the query
 
-            $query = Theme::query();
+            //    $query = ModelColorWiseImage::query();
+
+            $query = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2']);
 
 
 
@@ -123,7 +112,7 @@ class ThemeController extends Controller
         $validated = $this->validateRequest($request);
 
         try {
-            $theme = new Theme();
+            $data = new ModelThemeWiseImage();
 
             // Use class properties here
             foreach ($this->typeOfFields as $fieldType) {
@@ -131,24 +120,24 @@ class ThemeController extends Controller
                     switch ($fieldType) {
                         case 'imageFields':
                             if ($request->hasFile($field)) {
-                                $theme->$field = HelperMethods::uploadImage($request->file($field));
+                                $data->$field = HelperMethods::uploadImage($request->file($field));
                             }
                             break;
 
                         case 'textFields':
                             if (isset($validated[$field])) {
-                                $theme->$field = $validated[$field];
+                                $data->$field = $validated[$field];
                             }
                             break;
                     }
                 }
             }
 
-            $theme->save();
+            $data->save();
 
-            return $this->responseSuccess($theme, 'Theme created successfully', 201);
+            return $this->responseSuccess($data, 'data created successfully', 201);
         } catch (\Exception $e) {
-            Log::error('Error creating Theme: ' . $e->getMessage(), [
+            Log::error('Error creating data: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
@@ -157,12 +146,10 @@ class ThemeController extends Controller
         }
     }
 
-
-
     /**
      * Display the specified resource.
      */
-    public function show(Theme $theme)
+    public function show(ModelThemeWiseImage $modelThemeWiseImage)
     {
         //
     }
@@ -170,7 +157,7 @@ class ThemeController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Theme $theme)
+    public function edit(ModelThemeWiseImage $modelThemeWiseImage)
     {
         //
     }
@@ -178,12 +165,12 @@ class ThemeController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, ModelThemeWiseImage $modelThemeWiseImage)
     {
         $validated = $this->validateRequest($request);
 
         try {
-            $theme = Theme::findOrFail($id);
+            $data = $modelThemeWiseImage;
 
             // Use class properties here
             foreach ($this->typeOfFields as $fieldType) {
@@ -191,24 +178,24 @@ class ThemeController extends Controller
                     switch ($fieldType) {
                         case 'imageFields':
                             if ($request->hasFile($field)) {
-                                $theme->$field = HelperMethods::updateImage($request->file($field), $theme->$field);
+                                $data->$field = HelperMethods::updateImage($request->file($field), $theme->$field);
                             }
                             break;
 
                         case 'textFields':
                             if (isset($validated[$field])) {
-                                $theme->$field = $validated[$field];
+                                $data->$field = $validated[$field];
                             }
                             break;
                     }
                 }
             }
 
-            $theme->save();
+            $data->save();
 
-            return $this->responseSuccess($theme, 'Theme updated successfully', 200);
+            return $this->responseSuccess($data, 'data created successfully', 201);
         } catch (\Exception $e) {
-            Log::error('Error updating Theme: ' . $e->getMessage(), [
+            Log::error('Error creating data: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
@@ -217,37 +204,30 @@ class ThemeController extends Controller
         }
     }
 
-
-
-
-    /**
-     * Handle image update - upload new image and delete old one if exists
-     */
-
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(Theme $theme)
+    public function destroy(ModelThemeWiseImage $modelThemeWiseImage)
     {
         try {
             // Delete associated images if they exist
             foreach ($this->typeOfFields as $fieldType) {
                 if ($fieldType === 'imageFields') {
                     foreach ($this->{$fieldType} as $field) {
-                        if ($theme->$field) {
-                            HelperMethods::deleteImage($theme->$field);
+                        if ($modelThemeWiseImage->$field) {
+                            HelperMethods::deleteImage($modelThemeWiseImage->$field);
                         }
                     }
                 }
             }
 
             // Delete the record
-            $theme->delete();
+            $modelThemeWiseImage->delete();
 
             return $this->responseSuccess(null, 'Data deleted successfully', 200);
         } catch (\Exception $e) {
-            Log::error('Error deleting theme: ' . $e->getMessage(), [
-                'theme_id' => $theme->id,
+            Log::error('Error deleting data: ' . $e->getMessage(), [
+                'model_id' => $modelThemeWiseImage->id,
                 'error' => $e->getTraceAsString(),
             ]);
 
@@ -255,39 +235,13 @@ class ThemeController extends Controller
         }
     }
 
-    private function validateRequest(Request $request)
+    protected function validateRequest($request)
     {
         return $request->validate([
-            'name' => 'required|string|max:255',
-            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Flooring
-            'flooring_name' => 'required|string|max:255',
-            'flooring_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Cabinetry 1
-            'cabinetry_1_name' => 'required|string|max:255',
-            'cabinetry_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Cabinetry 2
-            'cabinetry_2_name' => 'required|string|max:255',
-            'cabinetry_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Table Top 1
-            'table_top_1_name' => 'required|string|max:255',
-            'table_top_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Table Top 2
-            'table_top_2_name' => 'required|string|max:255',
-            'table_top_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Seating 1
-            'seating_1_name' => 'required|string|max:255',
-            'seating_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-
-            // Seating 2
-            'seating_2_name' => 'required|string|max:255',
-            'seating_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'vehicle_model_id' => 'required|integer',
+            'theme_id' => 'nullable|integer',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
+    
 }

@@ -32,4 +32,9 @@ class Theme extends Model
     {
         return $this->hasMany(Order::class);
     }
+
+    public function modelThemeWiseImages()
+    {
+        return $this->hasMany(ModelThemeWiseImage::class);
+    }
 }

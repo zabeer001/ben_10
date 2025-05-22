@@ -6,6 +6,8 @@ use App\Http\Controllers\ColorController;
 use App\Http\Controllers\CustomerInfoController;
 use App\Http\Controllers\ForgetPassowrdController;
 use App\Http\Controllers\FrontendQueryController;
+use App\Http\Controllers\ModelColorWiseImageController;
+use App\Http\Controllers\ModelThemeWiseImageController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\ThemeController;
@@ -53,3 +55,7 @@ Route::apiResource('themes', ThemeController::class);
 
 Route::apiResource('orders', OrderController::class);
 
+
+
+Route::apiResource('model-theme-wise-image', ModelThemeWiseImageController::class);
+Route::apiResource('model-color-wise-image', ModelColorWiseImageController::class);
