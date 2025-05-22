@@ -27,6 +27,7 @@ class ModelThemeWiseImageController extends Controller
      */
     public function index(Request $request)
     {
+        // return'oka';
         // Validate query parameters
         $validated = $request->validate([
             'id' => 'nullable|integer|min:1',
@@ -42,7 +43,8 @@ class ModelThemeWiseImageController extends Controller
 
 
         if ($id) {
-            $data = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])::find($id);
+            // return 'ok';
+            $data = ModelThemeWiseImage::with(['vehicleModel', 'theme'])->find($id);
             if ($data) {
                 return $data;
             } else {
@@ -56,7 +58,10 @@ class ModelThemeWiseImageController extends Controller
 
             //    $query = ModelColorWiseImage::query();
 
-            $query = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2']);
+            $query = ModelThemeWiseImage::with([
+                'vehicleModel:id,name', // id is typically needed for the relationship
+                'theme:id,name'
+            ]);
 
 
 
@@ -178,7 +183,7 @@ class ModelThemeWiseImageController extends Controller
                     switch ($fieldType) {
                         case 'imageFields':
                             if ($request->hasFile($field)) {
-                                $data->$field = HelperMethods::updateImage($request->file($field), $theme->$field);
+                                $data->$field = HelperMethods::updateImage($request->file($field), $data->$field);
                             }
                             break;
 
@@ -243,5 +248,5 @@ class ModelThemeWiseImageController extends Controller
             'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
     }
-    
+
 }

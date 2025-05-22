@@ -17,9 +17,81 @@ class ModelColorWiseImageController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        // return'oka';
+        // Validate query parameters
+        $validated = $request->validate([
+            'id' => 'nullable|integer|min:1',
+            'paginate_count' => 'nullable|integer|min:1',
+            'search' => 'nullable|string|max:255',
+            'status' => 'nullable|string|max:255',
+        ]);
+
+        // Get query parameters
+        $paginate_count = $validated['paginate_count'] ?? 10;
+        $id = $validated['id'] ?? null;
+        $search = $validated['search'] ?? null;
+
+
+        if ($id) {
+            // return 'ok';
+            $data = ModelColorWiseImage::with(['vehicleModel','color1','color2' ])->find($id);
+            if ($data) {
+                return $data;
+            } else {
+                return response()->json(['message' => 'No data found'], 404);
+            }
+        }
+
+
+        try {
+            // Build the query
+
+            //    $query = ModelColorWiseImage::query();
+
+            $query = ModelColorWiseImage::with([
+                'vehicleModel:id,name', // id is typically needed for the relationship
+                'color1:id,name',
+                'color2:id,name'
+            ]);
+
+
+
+            // Apply search filter
+            if ($search) {
+                $query->where('name', 'like', $search . '%');
+            }
+
+            // Paginate the result
+            $data = $query->paginate($paginate_count);
+
+            // Check if any data was returned
+            if ($data->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No VehicleModels found',
+                    'data' => [],
+                ], 404);
+            }
+
+            // Return with pagination meta
+            return response()->json([
+                'success' => true,
+                'message' => 'Theme retrieved successfully',
+                'data' => $data,
+                'current_page' => $data->currentPage(),
+                'total_pages' => $data->lastPage(),
+                'per_page' => $data->perPage(),
+                'total' => $data->total(),
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch VehicleModels.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**MM
@@ -93,8 +165,9 @@ class ModelColorWiseImageController extends Controller
      */
     public function update(Request $request, ModelColorWiseImage $modelColorWiseImage)
     {
+    
         $validated = $this->validateRequest($request);
-
+    // return 0;
         try {
             $data = $modelColorWiseImage;
 
@@ -107,7 +180,7 @@ class ModelColorWiseImageController extends Controller
                                 if ($data->$field) {
                                     HelperMethods::deleteImage($data->$field);
                                 }
-                                $data->$field = HelperMethods::uploadImage($request->file($field));
+                               $data->$field = HelperMethods::updateImage($request->file($field), $data->$field);
                             }
                             break;
 
@@ -168,7 +241,7 @@ class ModelColorWiseImageController extends Controller
             'vehicle_model_id' => 'required|integer',
             'color_1_id' => 'required|integer',
             'color_2_id' => 'nullable|integer',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+            'image' => 'required',
         ]);
     }
 }
