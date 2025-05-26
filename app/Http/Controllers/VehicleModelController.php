@@ -41,7 +41,7 @@ class VehicleModelController extends Controller
         $status = $validated['status'] ?? null;
 
         if ($id) {
-           $data = VehicleModel::with('categories')->find($id);
+            $data = VehicleModel::with('categories')->find($id);
             if ($data) {
                 return $data;
             } else {
@@ -244,27 +244,22 @@ class VehicleModelController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(VehicleModel $vehicleModel)
+    public function destroy($id)
     {
-        try {
-            // Delete associated image file if it exists
-            if ($vehicleModel->inner_image && file_exists(public_path($vehicleModel->inner_image))) {
-                unlink(public_path($vehicleModel->inner_image));
-            }
+        $item = VehicleModel::find($id);
 
-            // Delete the vehicle model
-            $vehicleModel->delete();
-
-            Log::info('VehicleModel deleted', ['vehicle_model_id' => $vehicleModel->id]);
-
-            return $this->responseSuccess(null, 'Vehicle model deleted successfully', 200);
-        } catch (\Exception $e) {
-            Log::error('Error deleting vehicle model: ' . $e->getMessage(), [
-                'vehicle_model_id' => $vehicleModel->id,
-                'error' => $e->getTraceAsString(),
-            ]);
-
-            return $this->responseError('Failed to delete vehicle model', $e->getMessage(), 500);
+        if ($item->inner_image && file_exists(public_path($item->inner_image))) {
+            unlink(public_path($item->inner_image));
         }
+
+
+
+        if (!$item) {
+            return response()->json(['message' => 'Item not found'], 404);
+        }
+
+        $item->delete();
+
+        return response()->json(['message' => 'Item deleted successfully'], 200);
     }
 }
