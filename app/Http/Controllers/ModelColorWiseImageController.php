@@ -9,6 +9,11 @@ use Illuminate\Support\Facades\Log;
 
 class ModelColorWiseImageController extends Controller
 {
+      public function __construct()
+    {
+        // Apply JWT authentication middleware only to store, update, and destroy methods
+        $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'statusUpdate']);
+    }
     protected array $typeOfFields = ['imageFields', 'textFields'];
 
     protected array $imageFields = ['image'];
