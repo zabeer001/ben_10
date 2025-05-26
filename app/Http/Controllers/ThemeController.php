@@ -120,12 +120,11 @@ class ThemeController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $this->validateRequest($request);
-
         try {
+            $validated = $this->validateRequest($request); // May throw ValidationException
+
             $theme = new Theme();
 
-            // Use class properties here
             foreach ($this->typeOfFields as $fieldType) {
                 foreach ($this->{$fieldType} as $field) {
                     switch ($fieldType) {
@@ -147,6 +146,10 @@ class ThemeController extends Controller
             $theme->save();
 
             return $this->responseSuccess($theme, 'Theme created successfully', 201);
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->responseError('Validation failed', $e->errors(), 422);
+
         } catch (\Exception $e) {
             Log::error('Error creating Theme: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
@@ -227,7 +230,7 @@ class ThemeController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-   public function destroy(Theme $theme)
+    public function destroy(Theme $theme)
     {
         try {
             // Delete associated images if they exist
@@ -259,35 +262,35 @@ class ThemeController extends Controller
     {
         return $request->validate([
             'name' => 'required|string|max:255',
-            'image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'image' => 'nullable|file|max:10240',
 
             // Flooring
             'flooring_name' => 'required|string|max:255',
-            'flooring_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'flooring_image' => 'nullable|file|max:10240',
 
             // Cabinetry 1
             'cabinetry_1_name' => 'required|string|max:255',
-            'cabinetry_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'cabinetry_1_image' => 'nullable|file|max:10240',
 
             // Cabinetry 2
             'cabinetry_2_name' => 'required|string|max:255',
-            'cabinetry_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'cabinetry_2_image' => 'nullable|file|max:10240',
 
             // Table Top 1
             'table_top_1_name' => 'required|string|max:255',
-            'table_top_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'table_top_1_image' => 'nullable|file|max:10240',
 
             // Table Top 2
             'table_top_2_name' => 'required|string|max:255',
-            'table_top_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'table_top_2_image' => 'nullable|file|max:10240',
 
             // Seating 1
             'seating_1_name' => 'required|string|max:255',
-            'seating_1_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'seating_1_image' => 'nullable|file|max:10240',
 
             // Seating 2
             'seating_2_name' => 'required|string|max:255',
-            'seating_2_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
+            'seating_2_image' => 'nullable|file|max:10240',
         ]);
     }
 }
