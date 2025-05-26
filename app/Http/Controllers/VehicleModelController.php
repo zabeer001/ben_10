@@ -17,6 +17,28 @@ class VehicleModelController extends Controller
         $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'statusUpdate']);
     }
 
+    protected $typeOfFields = ['imageFields', 'textFields', 'numericFields'];
+
+    protected $imageFields = ['inner_image'];
+
+    protected $textFields = ['name', 'sleep_person', 'description'];
+
+    protected $numericFields = ['price', 'base_price','category_id'];
+
+
+    protected function validateRequest(Request $request)
+    {
+        return $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'sleep_person' => 'sometimes|string',
+            'description' => 'sometimes|string',
+            'inner_image' => 'nullable|file|max:50240', // 10 MB = 10240 KB
+            'category_id' => 'sometimes|exists:categories,id',
+            'price' => 'sometimes|numeric|min:0',
+            'base_price' => 'sometimes|numeric|min:0',
+        ]);
+    }
+
 
     /**
      * Display a listing of the resource.
@@ -194,44 +216,49 @@ class VehicleModelController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validated = $this->validateRequest($request);
 
-        // Validate the incoming request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sleep_person' => 'required|string',
-            'description' => 'required',
-            'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240',
-            'category_id' => 'required',
-            'price' => 'nullable|numeric|min:0',
-            'base_price' => 'required|numeric|min:0',
-        ]);
-        //  return 'ok';
         try {
-            $vehicleModel = VehicleModel::findOrFail($id); // Find model or fail
-            return $vehicleModel;
+            $vehicleModel = VehicleModel::findOrFail($id);
 
-            // Handle image upload if present
-            if ($request->hasFile('inner_image')) {
-                $imagePath = HelperMethods::updateImage($request->file('inner_image'));
-                $vehicleModel->inner_image = $imagePath;
+            // Use class properties to update fields
+            foreach ($this->typeOfFields as $fieldType) {
+                foreach ($this->{$fieldType} as $field) {
+                    switch ($fieldType) {
+                        case 'imageFields':
+                            if ($request->hasFile($field)) {
+                                $vehicleModel->$field = HelperMethods::updateImage(
+                                    $request->file($field),
+                                    $vehicleModel->$field
+                                );
+                            }
+                            break;
+
+                        case 'textFields':
+                        case 'numericFields':
+                            if (isset($validated[$field])) {
+                                $vehicleModel->$field = $validated[$field];
+                            }
+                            break;
+                    }
+                }
             }
 
-            // Update the model fields
-            $vehicleModel->name = $validated['name'];
-            $vehicleModel->sleep_person = $validated['sleep_person'];
-            $vehicleModel->description = $validated['description'];
-            $vehicleModel->category_id = $validated['category_id'];
-            $vehicleModel->price = $validated['price'];
-            $vehicleModel->base_price = $validated['base_price'];
+           
+          
+
             $vehicleModel->save();
 
+            
+
             return $this->responseSuccess(
-                $vehicleModel->load('category'), // note: 'category', not 'categories'
-                'Tile updated successfully',
+                $vehicleModel->load(['categories']),
+                'VehicleModel updated successfully',
                 200
             );
         } catch (\Exception $e) {
-            Log::error('Error updating tile: ' . $e->getMessage(), [
+            Log::error('Error updating VehicleModel: ' . $e->getMessage(), [
+                'vehicle_model_id' => $id,
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
@@ -239,6 +266,7 @@ class VehicleModelController extends Controller
             return $this->responseError('Something went wrong', $e->getMessage(), 500);
         }
     }
+
 
 
     /**
