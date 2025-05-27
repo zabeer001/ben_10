@@ -187,4 +187,14 @@ public function index(Request $request)
         }
     }
 
+     public function allTypes()
+    {
+    // return 0 ;
+        $category_name = AdditionalOption::distinct()->pluck('category_name');
+        return response()->json([
+            'success' => true,
+            'data' => $category_name
+        ]);
+    }
+
 }

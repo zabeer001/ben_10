@@ -18,6 +18,10 @@ return new class extends Migration {
             $table->decimal('base_price', 10, 2);
             $table->decimal('total_price', 10, 2);
             $table->string('status')->default('pending');
+
+            // Add two color foreign keys from the `colors` table
+            $table->foreignId('external_base_colour_id')->nullable()->constrained('colors')->onDelete('cascade');
+            $table->foreignId('external_decay_colour_id')->nullable()->constrained('colors')->onDelete('cascade');
             $table->timestamps();
         });
     }

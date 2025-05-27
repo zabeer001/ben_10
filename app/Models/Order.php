@@ -14,6 +14,8 @@ class Order extends Model
         'theme_id',
         'base_price',
         'total_price',
+        'external_base_colour_id',
+        'external_decay_colour_id',
     ];
 
 
@@ -38,8 +40,18 @@ class Order extends Model
         return $this->belongsTo(Theme::class);
     }
 
-     public function customerInfo()
+    public function customerInfo()
     {
         return $this->belongsTo(CustomerInfo::class);
+    }
+
+    public function externalBaseColour()
+    {
+        return $this->belongsTo(Color::class, 'external_base_colour_id');
+    }
+
+    public function externalDecayColour()
+    {
+        return $this->belongsTo(Color::class, 'external_decay_colour_id');
     }
 }
