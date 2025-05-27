@@ -74,4 +74,31 @@ class HelperMethods
     }
 
 
+    public static function populateModelFields($model, $request, $validated, $fieldTypes, $fieldGroups)
+    {
+        foreach ($fieldTypes as $fieldType) {
+            foreach ($fieldGroups[$fieldType] as $field) {
+                switch ($fieldType) {
+                    case 'imageFields':
+                        if ($request->hasFile($field)) {
+                            $model->$field = isset($model->$field)
+                                ? self::updateImage($request->file($field), $model->$field)
+                                : self::uploadImage($request->file($field));
+                        }
+                        break;
+
+                    case 'textFields':
+                    case 'numericFields':
+                        if (isset($validated[$field])) {
+                            $model->$field = $validated[$field];
+                        }
+                        break;
+                }
+            }
+        }
+
+        return $model;
+    }
+
+
 }

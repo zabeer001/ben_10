@@ -7,6 +7,7 @@ use App\Models\VehicleModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Validation\ValidationException;
 
 
 class VehicleModelController extends Controller
@@ -23,7 +24,9 @@ class VehicleModelController extends Controller
 
     protected $textFields = ['name', 'sleep_person', 'description'];
 
-    protected $numericFields = ['price', 'base_price','category_id'];
+    protected $numericFields = ['price', 'base_price', 'category_id'];
+
+
 
 
     protected function validateRequest(Request $request)
@@ -214,48 +217,43 @@ class VehicleModelController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, $id)
+       public function update(Request $request, $id)
     {
-        $validated = $this->validateRequest($request);
-
         try {
+            $validated = $this->validateRequest($request);
+
             $vehicleModel = VehicleModel::findOrFail($id);
 
-            // Use class properties to update fields
-            foreach ($this->typeOfFields as $fieldType) {
-                foreach ($this->{$fieldType} as $field) {
-                    switch ($fieldType) {
-                        case 'imageFields':
-                            if ($request->hasFile($field)) {
-                                $vehicleModel->$field = HelperMethods::updateImage(
-                                    $request->file($field),
-                                    $vehicleModel->$field
-                                );
-                            }
-                            break;
+            // Reuse helper to populate fields
+            HelperMethods::populateModelFields(
+                $vehicleModel,
+                $request,
+                $validated,
+                $this->typeOfFields,
+                [
+                    'imageFields' => $this->imageFields,
+                    'textFields' => $this->textFields,
+                    'numericFields' => $this->numericFields,
+                ]
+            );
 
-                        case 'textFields':
-                        case 'numericFields':
-                            if (isset($validated[$field])) {
-                                $vehicleModel->$field = $validated[$field];
-                            }
-                            break;
-                    }
-                }
-            }
-
-           
-          
-
+       
+        
             $vehicleModel->save();
-
-            
 
             return $this->responseSuccess(
                 $vehicleModel->load(['categories']),
                 'VehicleModel updated successfully',
                 200
             );
+        } catch (ValidationException $e) {
+            Log::warning('Validation failed for VehicleModel update', [
+                'vehicle_model_id' => $id,
+                'request_data' => $request->all(),
+                'errors' => $e->errors(),
+            ]);
+
+            return $this->responseError('Validation failed', $e->errors(), 422);
         } catch (\Exception $e) {
             Log::error('Error updating VehicleModel: ' . $e->getMessage(), [
                 'vehicle_model_id' => $id,

@@ -7,6 +7,7 @@ use App\Models\Theme;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
+
 class ThemeController extends Controller
 {
     protected array $typeOfFields = ['imageFields', 'textFields'];
