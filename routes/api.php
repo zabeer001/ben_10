@@ -38,6 +38,7 @@ Route::apiResource('categories', CategoryController::class);
 
 //colors
 Route::apiResource('colors', ColorController::class);
+Route::get('colors-types', [ColorController::class, 'allTypes']);
 // Route::put('colors/status/{id}', [ColorController::class, 'statusUpdate']);
 
 Route::apiResource('models', VehicleModelController::class);
@@ -49,6 +50,9 @@ Route::apiResource('addtional-options', AdditionalOptionController::class);
 
 Route::get('frontend-models-category', [FrontendQueryController::class, 'frontendModelsCategory']);
 Route::get('frontend-additional-options', [FrontendQueryController::class, 'frontendAdditionalOptions']);
+
+
+
 
 
 Route::apiResource('themes', ThemeController::class);

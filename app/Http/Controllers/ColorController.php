@@ -25,11 +25,13 @@ class ColorController extends Controller
             'paginate_count' => 'nullable|integer|min:1',
             'query' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
         ]);
         $id = $validated['id'] ?? null;
         $paginate_count = $validated['paginate_count'] ?? 10;
         $query = $validated['query'] ?? null;
         $status = $validated['status'] ?? null;
+        $type = $validated['type'] ?? null;
 
 
         try {
@@ -50,6 +52,11 @@ class ColorController extends Controller
             if ($status) {
                 $colorQuery->where('status', 'like', $status . '%');
             }
+
+            if ($type) {
+                $colorQuery->where('type', 'like', $type . '%');
+            }
+
 
             $colors = $colorQuery->paginate($paginate_count);
 
@@ -85,6 +92,7 @@ class ColorController extends Controller
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:255', // Code is optional
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:10240',
+            'type' => 'nullable|string|max:255',
         ]);
         // return $request;
 
@@ -96,6 +104,7 @@ class ColorController extends Controller
             // Create a new color instance
             $color = new Color();
             $color->name = $validated['name'];
+            $color->type = $validated['type'];
             $color->code = $request->code;
             $color->image = $imagePath;
             $color->save();
@@ -142,6 +151,7 @@ class ColorController extends Controller
             'code' => 'nullable|string|max:255', // Color code is optional
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Image is optional
             'status' => 'nullable|string|max:255', // Status is optional
+            'type' => 'nullable|string|max:255',
         ]);
 
         try {
@@ -164,6 +174,10 @@ class ColorController extends Controller
             // Only update status if provided
             if ($request->filled('status')) {
                 $updateData['status'] = $validated['status'];
+            }
+
+            if ($request->filled('type')) {
+                $updateData['type'] = $validated['type'];
             }
 
             // Handle image update (if provided), and set code to null
@@ -238,6 +252,16 @@ class ColorController extends Controller
             'message' => 'Category status updated successfully',
             'color' => $color
         ], 200);
+    }
+
+    public function allTypes()
+    {
+    // return 0 ;
+        $types = Color::distinct()->pluck('type');
+        return response()->json([
+            'success' => true,
+            'data' => $types
+        ]);
     }
     // arr = [1,5,7]
     //for(i=1;i<arr.len(arr);i++){

@@ -13,6 +13,7 @@ class Color extends Model
         'code',
         'image',
         'status',
+        'type',
     ];
 
     public function orders()
