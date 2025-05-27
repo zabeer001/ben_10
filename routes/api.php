@@ -46,7 +46,7 @@ Route::apiResource('models', VehicleModelController::class);
 Route::apiResource('customers', CustomerInfoController::class);
 
 Route::apiResource('addtional-options', AdditionalOptionController::class);
-Route::get('addtional-options-type', [AdditionalOptionController::class, 'allTypes']);
+Route::get('addtional-options-category', [AdditionalOptionController::class, 'allTypes']);
 
 
 Route::get('frontend-models-category', [FrontendQueryController::class, 'frontendModelsCategory']);
