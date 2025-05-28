@@ -8,7 +8,7 @@ class Category extends Model
 {
     protected $fillable = ['name']; // adjust fields as needed
 
-    public function vehicleModels(): HasMany
+    public function vehicleModels()
     {
         return $this->hasMany(VehicleModel::class);
     }
