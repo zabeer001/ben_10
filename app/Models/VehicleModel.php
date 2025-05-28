@@ -12,6 +12,7 @@ class VehicleModel extends Model
         'sleep_person',
         'description',
         'inner_image',
+        'outer_image',
         'category_id',
         'base_price',
         'price',

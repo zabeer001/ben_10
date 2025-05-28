@@ -20,7 +20,7 @@ class VehicleModelController extends Controller
 
     protected $typeOfFields = ['imageFields', 'textFields', 'numericFields'];
 
-    protected $imageFields = ['inner_image'];
+    protected $imageFields = ['inner_image','outer_image'];
 
     protected $textFields = ['name', 'sleep_person', 'description'];
 
@@ -36,6 +36,7 @@ class VehicleModelController extends Controller
             'sleep_person' => 'sometimes|string',
             'description' => 'sometimes|string',
             'inner_image' => 'nullable|file|max:50240', // 10 MB = 10240 KB
+            'outer_image' => 'nullable|file|max:50240', // 10 MB = 10240 KB
             'category_id' => 'sometimes|exists:categories,id',
             'price' => 'sometimes|numeric|min:0',
             'base_price' => 'sometimes|numeric|min:0',
