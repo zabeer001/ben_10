@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Log;
 
 class ModelThemeWiseImageController extends Controller
 {
-      public function __construct()
+    public function __construct()
     {
         // Apply JWT authentication middleware only to store, update, and destroy methods
         $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'statusUpdate']);
@@ -39,12 +39,16 @@ class ModelThemeWiseImageController extends Controller
             'paginate_count' => 'nullable|integer|min:1',
             'search' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
+            'model_id' => 'nullable|integer|min:1',
+            'theme_id' => 'nullable|integer|min:1',
         ]);
 
         // Get query parameters
         $paginate_count = $validated['paginate_count'] ?? 10;
         $id = $validated['id'] ?? null;
         $search = $validated['search'] ?? null;
+        $model_id = $validated['model_id'] ?? null;
+        $theme_id = $validated['theme_id'] ?? null;
 
 
         if ($id) {
@@ -57,6 +61,7 @@ class ModelThemeWiseImageController extends Controller
             }
         }
 
+      
 
         try {
             // Build the query
@@ -74,6 +79,15 @@ class ModelThemeWiseImageController extends Controller
             if ($search) {
                 $query->where('name', 'like', $search . '%');
             }
+
+              if ($model_id) {
+            $query->where('vehicle_model_id', $model_id);
+        }
+
+        if ($theme_id) {
+            $query->where('theme_id', $theme_id);
+        }
+
 
             // Paginate the result
             $data = $query->paginate($paginate_count);
