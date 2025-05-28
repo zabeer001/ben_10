@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Log;
 
 class ModelColorWiseImageController extends Controller
 {
-      public function __construct()
+    public function __construct()
     {
         // Apply JWT authentication middleware only to store, update, and destroy methods
         $this->middleware('auth:api')->only(['store', 'update', 'destroy', 'statusUpdate']);
@@ -31,17 +31,24 @@ class ModelColorWiseImageController extends Controller
             'paginate_count' => 'nullable|integer|min:1',
             'search' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
+            'model_id' => 'nullable|integer|min:1',
+            'color_1_id' => 'nullable|integer|min:1',
+            'color_2_id' => 'nullable|integer|min:1',
         ]);
 
         // Get query parameters
         $paginate_count = $validated['paginate_count'] ?? 10;
         $id = $validated['id'] ?? null;
         $search = $validated['search'] ?? null;
+        $model_id = $validated['model_id'] ?? null;
+        $color_1_id = $validated['color_1_id'] ?? null;
+        $color_2_id = $validated['color_2_id'] ?? null;
+
 
 
         if ($id) {
             // return 'ok';
-            $data = ModelColorWiseImage::with(['vehicleModel','color1','color2' ])->find($id);
+            $data = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])->find($id);
             if ($data) {
                 return $data;
             } else {
@@ -60,6 +67,20 @@ class ModelColorWiseImageController extends Controller
                 'color1:id,name',
                 'color2:id,name'
             ]);
+
+
+
+            if ($model_id) {
+                $query->where('vehicle_model_id', $model_id);
+            }
+
+            if ($color_1_id) {
+                $query->where('color_1_id', $color_1_id);
+            }
+
+            if ($color_2_id) {
+                $query->where('color_2_id', $color_2_id);
+            }
 
 
 
@@ -170,9 +191,9 @@ class ModelColorWiseImageController extends Controller
      */
     public function update(Request $request, ModelColorWiseImage $modelColorWiseImage)
     {
-    
+
         $validated = $this->validateRequest($request);
-    // return 0;
+        // return 0;
         try {
             $data = $modelColorWiseImage;
 
@@ -185,7 +206,7 @@ class ModelColorWiseImageController extends Controller
                                 if ($data->$field) {
                                     HelperMethods::deleteImage($data->$field);
                                 }
-                               $data->$field = HelperMethods::updateImage($request->file($field), $data->$field);
+                                $data->$field = HelperMethods::updateImage($request->file($field), $data->$field);
                             }
                             break;
 

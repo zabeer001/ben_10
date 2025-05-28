@@ -21,8 +21,10 @@ class ColorController extends Controller
     public function index(Request $request)
     {
         $validated = $request->validate([
+
             'id' => 'nullable|integer',
             'paginate_count' => 'nullable|integer|min:1',
+            'type_wise' => 'nullable|string|max:255',
             'query' => 'nullable|string|max:255',
             'status' => 'nullable|string|max:255',
             'type' => 'nullable|string|max:255',
@@ -31,6 +33,7 @@ class ColorController extends Controller
         $paginate_count = $validated['paginate_count'] ?? 10;
         $query = $validated['query'] ?? null;
         $status = $validated['status'] ?? null;
+        $type_wise = $validated['type_wise'] ?? null;
         $type = $validated['type'] ?? null;
 
 
@@ -59,6 +62,14 @@ class ColorController extends Controller
 
 
             $colors = $colorQuery->paginate($paginate_count);
+
+            if ($type_wise == 'type_wise') {
+
+
+                $colors = Color::all()->groupBy('type');
+
+                return $colors;
+            }
 
             return response()->json([
                 'data' => $colors,
@@ -256,7 +267,7 @@ class ColorController extends Controller
 
     public function allTypes()
     {
-    // return 0 ;
+        // return 0 ;
         $types = Color::distinct()->pluck('type');
         return response()->json([
             'success' => true,

@@ -61,7 +61,7 @@ class ModelThemeWiseImageController extends Controller
             }
         }
 
-      
+
 
         try {
             // Build the query
@@ -80,13 +80,13 @@ class ModelThemeWiseImageController extends Controller
                 $query->where('name', 'like', $search . '%');
             }
 
-              if ($model_id) {
-            $query->where('vehicle_model_id', $model_id);
-        }
+            if ($model_id) {
+                $query->where('vehicle_model_id', $model_id);
+            }
 
-        if ($theme_id) {
-            $query->where('theme_id', $theme_id);
-        }
+            if ($theme_id) {
+                $query->where('theme_id', $theme_id);
+            }
 
 
             // Paginate the result
