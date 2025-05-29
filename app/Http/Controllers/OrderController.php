@@ -87,7 +87,7 @@ class OrderController extends Controller
 
         try {
             if ($id) {
-                $order = Order::with(['vehicleModel', 'theme', 'customerInfo'])->find($id);
+                $order = Order::with(['vehicleModel', 'theme', 'customerInfo','colors'])->find($id);
                 if ($order) {
                     return response()->json([
                         'success' => true,

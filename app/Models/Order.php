@@ -45,13 +45,13 @@ class Order extends Model
         return $this->belongsTo(CustomerInfo::class);
     }
 
-    public function externalBaseColour()
-    {
-        return $this->belongsTo(Color::class, 'external_base_colour_id');
-    }
+    // public function externalBaseColour()
+    // {
+    //     return $this->belongsTo(Color::class, 'external_base_colour_id');
+    // }
 
-    public function externalDecayColour()
-    {
-        return $this->belongsTo(Color::class, 'external_decay_colour_id');
-    }
+    // public function externalDecayColour()
+    // {
+    //     return $this->belongsTo(Color::class, 'external_decay_colour_id');
+    // }
 }
