@@ -47,104 +47,104 @@ class VehicleModelController extends Controller
     /**
      * Display a listing of the resource.
      */
- public function index(Request $request)
-{
-    // Validate query parameters
-    $validated = $request->validate([
-        'id' => 'nullable|integer|min:1',
-        'paginate_count' => 'nullable|integer|min:1',
-        'search' => 'nullable|string|max:255',
-        'category' => 'nullable|string|exists:categories,name',
-        'color' => 'nullable|string|exists:colors,name',
-        'status' => 'nullable|string|max:255',
-    ]);
+    public function index(Request $request)
+    {
+        // Validate query parameters
+        $validated = $request->validate([
+            'id' => 'nullable|integer|min:1',
+            'paginate_count' => 'nullable|integer|min:1',
+            'search' => 'nullable|string|max:255',
+            'category' => 'nullable|string|exists:categories,name',
+            'color' => 'nullable|string|exists:colors,name',
+            'status' => 'nullable|string|max:255',
+        ]);
 
-    // Extract validated parameters with default values
-    $paginate_count = $validated['paginate_count'] ?? 10;
-    $id = $validated['id'] ?? null;
-    $search = $validated['search'] ?? null;
-    $category = $validated['category'] ?? null;
-    $color = $validated['color'] ?? null;
-    $status = $validated['status'] ?? null;
+        // Extract validated parameters with default values
+        $paginate_count = $validated['paginate_count'] ?? 10;
+        $id = $validated['id'] ?? null;
+        $search = $validated['search'] ?? null;
+        $category = $validated['category'] ?? null;
+        $color = $validated['color'] ?? null;
+        $status = $validated['status'] ?? null;
 
-    // Fetch by ID if provided
-    if ($id) {
-        $data = VehicleModel::with(['category', 'colors'])->find($id);
-        if ($data) {
+        // Fetch by ID if provided
+        if ($id) {
+            $data = VehicleModel::with(['category', 'colors'])->find($id);
+            if ($data) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'VehicleModel retrieved successfully',
+                    'data' => $data,
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No data found',
+                    'data' => null,
+                ], 404);
+            }
+        }
+
+        try {
+            // Build base query with eager loading
+            $query = VehicleModel::with(['category']);
+
+            // Apply search filter
+            if ($search) {
+                $query->where('name', 'like', $search . '%');
+            }
+
+            // Apply category filter via relationship
+            if ($category) {
+                $query->whereHas('category', function ($q) use ($category) {
+                    $q->where('name', $category);
+                });
+            }
+
+            // Apply color filter (if many-to-many relationship exists)
+            if ($color) {
+                $query->whereHas('colors', function ($q) use ($color) {
+                    $q->where('name', $color);
+                });
+                $query->with('colors');
+            }
+
+            // Apply status filter
+            if ($status) {
+                $query->where('status', 'like', $status . '%');
+            }
+
+            // Paginate results
+            $VehicleModels = $query->paginate($paginate_count);
+
+            // If no results
+            if ($VehicleModels->isEmpty()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No VehicleModels found',
+                    'data' => [],
+                ], 404);
+            }
+
+            // Return paginated data
             return response()->json([
                 'success' => true,
-                'message' => 'VehicleModel retrieved successfully',
-                'data' => $data,
+                'message' => 'VehicleModels retrieved successfully',
+                'data' => $VehicleModels->items(),
+                'current_page' => $VehicleModels->currentPage(),
+                'total_pages' => $VehicleModels->lastPage(),
+                'per_page' => $VehicleModels->perPage(),
+                'total' => $VehicleModels->total(),
             ], 200);
-        } else {
+
+        } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'No data found',
-                'data' => null,
-            ], 404);
+                'message' => 'Failed to fetch VehicleModels.',
+                'error' => $e->getMessage(),
+            ], 500);
         }
     }
-
-    try {
-        // Build base query with eager loading
-        $query = VehicleModel::with(['category']);
-
-        // Apply search filter
-        if ($search) {
-            $query->where('name', 'like', $search . '%');
-        }
-
-        // Apply category filter via relationship
-        if ($category) {
-            $query->whereHas('category', function ($q) use ($category) {
-                $q->where('name', $category);
-            });
-        }
-
-        // Apply color filter (if many-to-many relationship exists)
-        if ($color) {
-            $query->whereHas('colors', function ($q) use ($color) {
-                $q->where('name', $color);
-            });
-            $query->with('colors');
-        }
-
-        // Apply status filter
-        if ($status) {
-            $query->where('status', 'like', $status . '%');
-        }
-
-        // Paginate results
-        $VehicleModels = $query->paginate($paginate_count);
-
-        // If no results
-        if ($VehicleModels->isEmpty()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'No VehicleModels found',
-                'data' => [],
-            ], 404);
-        }
-
-        // Return paginated data
-        return response()->json([
-            'success' => true,
-            'message' => 'VehicleModels retrieved successfully',
-            'data' => $VehicleModels->items(),
-            'current_page' => $VehicleModels->currentPage(),
-            'total_pages' => $VehicleModels->lastPage(),
-            'per_page' => $VehicleModels->perPage(),
-            'total' => $VehicleModels->total(),
-        ], 200);
-
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to fetch VehicleModels.',
-            'error' => $e->getMessage(),
-        ], 500);
-    }
-}
 
 
     /**
@@ -167,8 +167,10 @@ class VehicleModelController extends Controller
             'name' => 'required|string|max:255',
             'sleep_person' => 'required|string',
             'description' => 'required',
-            'inner_image' => 'nullable|file|mimes:jpeg,png,jpg,gif,svg|max:10240', // 10 MB = 10240 KB
+            'inner_image' => 'nullable|file|max:10240', // 10 MB = 10240 KB
+            'outer_image' => 'nullable|file|max:10240', // 10 MB = 10240 KB
             'category_id' => 'required',
+
             // 'color_id' => 'nullable|array', // Added color_id validation
             // 'color_id.*' => 'exists:colors,id', // Ensure color_id exists in colors table
             'price' => 'required|numeric|min:0',
@@ -188,6 +190,7 @@ class VehicleModelController extends Controller
                 'name' => $validated['name'],
                 'sleep_person' => $validated['sleep_person'],
                 'description' => $validated['description'],
+                'outer_image' => $validated['outer_image'],
                 // 'image_svg_text' => $validated['image_svg_text'],
                 'inner_image' => $imagePath,
                 'category_id' => $validated['category_id'], // set the relationship
