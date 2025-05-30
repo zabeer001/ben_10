@@ -174,7 +174,6 @@ public function index(Request $request)
    public function destroy($id)
     {
         try {
-            // return $id;
             $AdditionalOption = AdditionalOption::findOrFail($id);
 
         
@@ -190,6 +189,16 @@ public function index(Request $request)
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function allTypes()
+    {
+    // return 0 ;
+        $category_name = AdditionalOption::distinct()->pluck('category_name');
+        return response()->json([
+            'success' => true,
+            'data' => $category_name
+        ]);
     }
 
 }
