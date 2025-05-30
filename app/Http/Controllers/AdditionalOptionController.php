@@ -171,30 +171,24 @@ public function index(Request $request)
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(AdditionalOption $additionalOption)
+   public function destroy($id)
     {
         try {
-            $additionalOption->delete();
+            $AdditionalOption = AdditionalOption::findOrFail($id);
 
-            return response()->json([
-                'message' => 'Option deleted successfully'
-            ], 200);
+        
+
+            // Delete the order
+            $AdditionalOption->delete();
+
+            return response()->json(['message' => 'Order deleted successfully'], 200);
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Failed to delete option',
-                'error' => $e->getMessage()
+                'success' => false,
+                'message' => 'Failed to delete order.',
+                'error' => $e->getMessage(),
             ], 500);
         }
-    }
-
-     public function allTypes()
-    {
-    // return 0 ;
-        $category_name = AdditionalOption::distinct()->pluck('category_name');
-        return response()->json([
-            'success' => true,
-            'data' => $category_name
-        ]);
     }
 
 }
