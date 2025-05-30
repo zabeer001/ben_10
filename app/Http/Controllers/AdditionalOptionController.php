@@ -174,6 +174,7 @@ public function index(Request $request)
    public function destroy($id)
     {
         try {
+            // return $id;
             $AdditionalOption = AdditionalOption::findOrFail($id);
 
         
