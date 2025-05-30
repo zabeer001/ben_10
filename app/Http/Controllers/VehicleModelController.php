@@ -160,56 +160,46 @@ class VehicleModelController extends Controller
      */
     public function store(Request $request)
     {
-
-        // dd($request);
-        // Validate the incoming request
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'sleep_person' => 'required|string',
-            'description' => 'required',
-            'inner_image' => 'nullable|file|max:10240', // 10 MB = 10240 KB
-            'outer_image' => 'nullable|file|max:10240', // 10 MB = 10240 KB
-            'category_id' => 'required',
-
-            // 'color_id' => 'nullable|array', // Added color_id validation
-            // 'color_id.*' => 'exists:colors,id', // Ensure color_id exists in colors table
-            'price' => 'required|numeric|min:0',
-            'base_price' => 'required|numeric|min:0',
-        ]);
-        // return 'ok';
-
         try {
-            // Handle image upload if present
-            $imagePath = null;
-            if ($request->hasFile('inner_image')) {
-                $imagePath = HelperMethods::uploadImage($request->file('inner_image'));
-            }
+            $validated = $this->validateRequest($request);
 
-            // Create a new tile
-            $VehicleModel = VehicleModel::create([
-                'name' => $validated['name'],
-                'sleep_person' => $validated['sleep_person'],
-                'description' => $validated['description'],
-                'outer_image' => $validated['outer_image'],
-                // 'image_svg_text' => $validated['image_svg_text'],
-                'inner_image' => $imagePath,
-                'category_id' => $validated['category_id'], // set the relationship
-                'base_price' => $validated['base_price'],
-                'price' => $validated['price'],
-            ]);
+            $vehicleModel = new VehicleModel();
 
-            // Sync relationships
-            // $VehicleModel->categories()->sync($validated['category_id']); set the relationship here
-            // $VehicleModel->colors()->sync($validated['color_id'] ?? []);
+            // Reuse helper to populate fields
+            HelperMethods::populateModelFields(
+                $vehicleModel,
+                $request,
+                $validated,
+                $this->typeOfFields,
+                [
+                    'imageFields' => $this->imageFields,
+                    'textFields' => $this->textFields,
+                    'numericFields' => $this->numericFields,
+                ]
+            );
+
+
+
+            $vehicleModel->save();
 
             return $this->responseSuccess(
-                // $VehicleModel->load(['categories', 'colors']),
-                $VehicleModel,
-                'VehicleModel created successfully',
-                201
+                $vehicleModel->load(['category']),
+                'VehicleModel updated successfully',
+                200
             );
+        } catch (ValidationException $e) {
+            DB::rollBack();
+
+            Log::warning('Validation failed for VehicleModel store', [
+                'request_data' => $request->all(),
+                'errors' => $e->errors(),
+            ]);
+
+            return $this->responseError('Validation failed', $e->errors(), 422);
         } catch (\Exception $e) {
-            Log::error('Error creating VehicleModel: ' . $e->getMessage(), [
+            DB::rollBack();
+
+            Log::error('Error storing VehicleModel: ' . $e->getMessage(), [
                 'request_data' => $request->all(),
                 'error' => $e->getTraceAsString(),
             ]);
@@ -217,6 +207,9 @@ class VehicleModelController extends Controller
             return $this->responseError('Something went wrong', $e->getMessage(), 500);
         }
     }
+
+
+
 
     /**
      * Display the specified resource.
