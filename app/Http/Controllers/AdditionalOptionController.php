@@ -181,11 +181,11 @@ public function index(Request $request)
             // Delete the order
             $AdditionalOption->delete();
 
-            return response()->json(['message' => 'Order deleted successfully'], 200);
+            return response()->json(['message' => 'data deleted successfully'], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Failed to delete order.',
+                'message' => 'Failed to delete data.',
                 'error' => $e->getMessage(),
             ], 500);
         }
