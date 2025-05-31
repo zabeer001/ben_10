@@ -16,7 +16,7 @@ class ModelColorWiseImageController extends Controller
     }
     protected array $typeOfFields = ['imageFields', 'textFields'];
 
-    protected array $imageFields = ['image'];
+    protected array $imageFields = ['image','image2'];
 
     protected array $textFields = ['vehicle_model_id', 'color_1_id', 'color_2_id'];
     /**
@@ -268,6 +268,7 @@ class ModelColorWiseImageController extends Controller
             'color_1_id' => 'required|integer',
             'color_2_id' => 'nullable|integer',
             'image' => 'required',
+            'image2' => 'nullable',
         ]);
     }
 }

@@ -16,6 +16,7 @@ class Order extends Model
         'total_price',
         'external_base_colour_id',
         'external_decay_colour_id',
+        'uniq_id',
     ];
 
 

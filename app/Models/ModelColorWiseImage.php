@@ -9,7 +9,7 @@ class ModelColorWiseImage extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['vehicle_model_id', 'color_1_id', 'color_2_id', 'image'];
+    protected $fillable = ['vehicle_model_id', 'color_1_id', 'color_2_id', 'image','image2'];
 
     public function vehicleModel()
     {

@@ -4,6 +4,7 @@ namespace App\Helpers;
 
 use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;  // Add this import to use Str
 
 class HelperMethods
 {
@@ -98,6 +99,19 @@ class HelperMethods
         }
 
         return $model;
+    }
+
+    public static function generateUniqueId(int $length = 40): string
+    {
+        $uuid = Str::uuid()->toString();
+        $cleanUuid = str_replace('-', '', $uuid);
+        $uniqId = $cleanUuid . time();
+
+        if (strlen($uniqId) > $length) {
+            $uniqId = substr($uniqId, -$length);
+        }
+
+        return $uniqId;
     }
 
 

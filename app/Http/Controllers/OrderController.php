@@ -5,9 +5,17 @@ namespace App\Http\Controllers;
 use App\Models\CustomerInfo;
 use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use App\Helpers\HelperMethods;
 
 class OrderController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth:api')->only(['index']);
+    }
 
     protected $typeOfFields = ['textFields'];
 
@@ -43,6 +51,7 @@ class OrderController extends Controller
             'email' => 'nullable|string',
             'phone' => 'nullable|string',
             'postal_code' => 'nullable|string',
+            'uniq_id' => 'nullable|string'
         ]);
     }
     protected function insertCustomerInfo($request)
@@ -73,6 +82,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+     
         $validated = $request->validate([
             'id' => 'nullable|integer|min:1',
             'paginate_count' => 'nullable|integer|min:1|max:100',
@@ -87,7 +97,7 @@ class OrderController extends Controller
 
         try {
             if ($id) {
-                $order = Order::with(['vehicleModel', 'theme', 'customerInfo','colors'])->find($id);
+                $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors'])->find($id);
                 if ($order) {
                     return response()->json([
                         'success' => true,
@@ -154,6 +164,10 @@ class OrderController extends Controller
 
             $customer = $this->insertCustomerInfo($request);
 
+            $uniqId = HelperMethods::generateUniqueId();
+
+            // Return the length of that unique ID string (should be 40)
+
 
             $data = new Order;
 
@@ -170,8 +184,9 @@ class OrderController extends Controller
             }
             // return 'ok';
 //   return $validated['color_id'];
-
+            $data->uniq_id = $uniqId;
             $data->customer_info_id = $customer->id;
+
 
             $data->save();
 
@@ -196,10 +211,16 @@ class OrderController extends Controller
     }
 
     // GET /orders/{id}
-    public function show($id)
+    public function show($uniq_id)
     {
-        $order = Order::with(['vehicleModel', 'theme', 'customerInfo'])->findOrFail($id);
-        return response()->json(['data' => $order]);
+        $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors'])
+            ->where('uniq_id', $uniq_id)
+            ->firstOrFail();
+
+        return response()->json([
+            'success' => true,
+            'data' => $order,
+        ]);
     }
 
     // PUT/PATCH /orders/{id}
@@ -234,6 +255,24 @@ class OrderController extends Controller
             ], 500);
         }
     }
+
+    public function updateStatus(Request $request, $id)
+    {
+        $request->validate([
+            'status' => 'required|string', // modify as needed
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order status updated successfully.',
+            'data' => $order,
+        ]);
+    }
+
 
 
 

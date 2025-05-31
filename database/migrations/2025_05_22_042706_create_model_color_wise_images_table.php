@@ -16,6 +16,7 @@ return new class extends Migration {
             $table->foreignId('color_1_id')->constrained('colors')->onDelete('cascade');
             $table->foreignId('color_2_id')->constrained('colors')->onDelete('cascade');
             $table->string('image');
+               $table->string('image2');
             $table->timestamps();
         });
     }

@@ -12,6 +12,7 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
+            $table->string('uniq_id');
             $table->foreignId('vehicle_model_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('theme_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('customer_info_id')->nullable()->constrained()->onDelete('cascade');

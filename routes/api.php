@@ -59,6 +59,8 @@ Route::get('frontend-additional-options', [FrontendQueryController::class, 'fron
 Route::apiResource('themes', ThemeController::class);
 
 Route::apiResource('orders', OrderController::class);
+Route::post('/orders/{id}/status', [OrderController::class, 'updateStatus']);
+
 
 
 
