@@ -7,7 +7,7 @@ return [
     'allowed_methods' => ['*'],
  
     // Allow only your frontend domain — NOT '*'
-    'allowed_origins' => ['http://localhost:5173'],
+    'allowed_origins' => ['https://williamcrosb344.vercel.app'],
  
     'allowed_origins_patterns' => [],
  
