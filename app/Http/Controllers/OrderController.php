@@ -237,15 +237,47 @@ class OrderController extends Controller
     // GET /orders/{id}
     public function show($uniq_id)
     {
+        // Find the order with relationships by uniq_id
         $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors', 'additionalOptions'])
             ->where('uniq_id', $uniq_id)
-            ->firstOrFail();
+            ->first();
+
+        // Handle not found case
+        if (!$order) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found',
+                'data' => null,
+            ], 404);
+        }
+
+        // Get vehicle model ID safely using optional chaining
+        $vehiclemodel_id = $order->vehicleModel?->id;
+
+        // Get color IDs from the colors relationship
+        $color_ids = $order->colors->pluck('id')->toArray();
+
+        $color_id_1 = $color_ids[0] ?? null;
+        $color_id_2 = $color_ids[1] ?? null;
+
+        // Retrieve model color-wise image with only required fields
+        $model_color_wise_image = ModelColorWiseImage::query()
+            ->select('image', 'image2')
+            ->where('vehicle_model_id', $vehiclemodel_id)
+            ->where('color_1_id', $color_id_1)
+            ->where('color_2_id', $color_id_2)
+            ->first();
 
         return response()->json([
             'success' => true,
-            'data' => $order,
-        ]);
+            'message' => 'Order retrieved successfully',
+            'data' => [
+                'order' => $order,
+                'model_color_wise_image' => $model_color_wise_image,
+            ],
+        ], 200);
     }
+
 
     // PUT/PATCH /orders/{id}
     public function update(Request $request, $id)
