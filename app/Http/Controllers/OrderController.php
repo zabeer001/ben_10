@@ -114,7 +114,7 @@ class OrderController extends Controller
                     ->where('vehicle_model_id', $vehiclemodel_id)
                     ->where('color_1_id', $color_id_1)
                     ->where('color_2_id', $color_id_2)
-                    ->get();
+                    ->first();
                 if ($order) {
                     return response()->json([
                         'success' => true,
