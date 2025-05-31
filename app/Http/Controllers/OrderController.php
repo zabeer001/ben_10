@@ -97,7 +97,7 @@ class OrderController extends Controller
 
         try {
             if ($id) {
-                $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors'])->find($id);
+                $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors','additionalOptions'])->find($id);
                 if ($order) {
                     return response()->json([
                         'success' => true,
@@ -213,7 +213,7 @@ class OrderController extends Controller
     // GET /orders/{id}
     public function show($uniq_id)
     {
-        $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors'])
+        $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors','additionalOptions'])
             ->where('uniq_id', $uniq_id)
             ->firstOrFail();
 
