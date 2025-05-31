@@ -109,7 +109,8 @@ class OrderController extends Controller
                 $color_id_1 = $color_ids[0] ?? null;
                 $color_id_2 = $color_ids[1] ?? null;
 
-                $model_color_wise_image = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])
+                $model_color_wise_image = ModelColorWiseImage::query()
+                    ->select('image', 'image_2')
                     ->where('vehicle_model_id', $vehiclemodel_id)
                     ->where('color_1_id', $color_id_1)
                     ->where('color_2_id', $color_id_2)
@@ -118,7 +119,8 @@ class OrderController extends Controller
                     return response()->json([
                         'success' => true,
                         'message' => 'Order retrieved successfully',
-                        'data' => $order,$model_color_wise_image,
+                        'data' => $order,
+                        $model_color_wise_image,
                     ], 200);
                 } else {
                     return response()->json([
