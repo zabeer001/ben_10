@@ -99,37 +99,43 @@ class OrderController extends Controller
         try {
             if ($id) {
                 $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors', 'additionalOptions'])->find($id);
-                // Get vehicle model ID
-                $vehiclemodel_id = $order->vehicleModel?->id;
 
-                // Get color IDs (assuming 'colors' is a relationship returning a collection)
-                $color_ids = $order->colors->pluck('id')->toArray(); // This gives you an array of color IDs
-
-                // Get specific colors if they exist
-                $color_id_1 = $color_ids[0] ?? null;
-                $color_id_2 = $color_ids[1] ?? null;
-
-                $model_color_wise_image = ModelColorWiseImage::query()
-                    ->select('image', 'image2')
-                    ->where('vehicle_model_id', $vehiclemodel_id)
-                    ->where('color_1_id', $color_id_1)
-                    ->where('color_2_id', $color_id_2)
-                    ->first();
-                if ($order) {
-                    return response()->json([
-                        'success' => true,
-                        'message' => 'Order retrieved successfully',
-                        'data' => $order,
-                        $model_color_wise_image,
-                    ], 200);
-                } else {
+                if (!$order) {
                     return response()->json([
                         'success' => false,
                         'message' => 'Order not found',
                         'data' => null,
                     ], 404);
                 }
+
+                // Get vehicle model ID
+                $vehiclemodel_id = $order->vehicleModel?->id;
+
+                // Get color IDs (assuming 'colors' is a relationship returning a collection)
+                $color_ids = $order->colors->pluck('id')->toArray();
+
+                // Get specific colors if they exist
+                $color_id_1 = $color_ids[0] ?? null;
+                $color_id_2 = $color_ids[1] ?? null;
+
+                // Retrieve model color-wise image with only selected fields
+                $model_color_wise_image = ModelColorWiseImage::query()
+                    ->select('image', 'image2')
+                    ->where('vehicle_model_id', $vehiclemodel_id)
+                    ->where('color_1_id', $color_id_1)
+                    ->where('color_2_id', $color_id_2)
+                    ->first();
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Order retrieved successfully',
+                    'data' => [
+                        'order' => $order,
+                        'model_color_wise_image' => $model_color_wise_image,
+                    ],
+                ], 200);
             }
+
 
             // Start with a query builder without eager loading
             $query = Order::query();
