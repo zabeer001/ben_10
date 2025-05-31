@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\CustomerInfo;
+use App\Models\ModelColorWiseImage;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -82,7 +83,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-     
+
         $validated = $request->validate([
             'id' => 'nullable|integer|min:1',
             'paginate_count' => 'nullable|integer|min:1|max:100',
@@ -97,12 +98,27 @@ class OrderController extends Controller
 
         try {
             if ($id) {
-                $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors','additionalOptions'])->find($id);
+                $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors', 'additionalOptions'])->find($id);
+                // Get vehicle model ID
+                $vehiclemodel_id = $order->vehicleModel?->id;
+
+                // Get color IDs (assuming 'colors' is a relationship returning a collection)
+                $color_ids = $order->colors->pluck('id')->toArray(); // This gives you an array of color IDs
+
+                // Get specific colors if they exist
+                $color_id_1 = $color_ids[0] ?? null;
+                $color_id_2 = $color_ids[1] ?? null;
+
+                $model_color_wise_image = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])
+                    ->where('vehiclemodel_id', $vehiclemodel_id)
+                    ->where('color_1_id', $color_id_1)
+                    ->where('color_2_id', $color_id_2)
+                    ->get();
                 if ($order) {
                     return response()->json([
                         'success' => true,
                         'message' => 'Order retrieved successfully',
-                        'data' => $order,
+                        'data' => $order,$model_color_wise_image,
                     ], 200);
                 } else {
                     return response()->json([
@@ -213,7 +229,7 @@ class OrderController extends Controller
     // GET /orders/{id}
     public function show($uniq_id)
     {
-        $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors','additionalOptions'])
+        $order = Order::with(['vehicleModel', 'theme', 'customerInfo', 'colors', 'additionalOptions'])
             ->where('uniq_id', $uniq_id)
             ->firstOrFail();
 
