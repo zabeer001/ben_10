@@ -110,7 +110,7 @@ class OrderController extends Controller
                 $color_id_2 = $color_ids[1] ?? null;
 
                 $model_color_wise_image = ModelColorWiseImage::with(['vehicleModel', 'color1', 'color2'])
-                    ->where('vehiclemodel_id', $vehiclemodel_id)
+                    ->where('vehicle_model_id', $vehiclemodel_id)
                     ->where('color_1_id', $color_id_1)
                     ->where('color_2_id', $color_id_2)
                     ->get();
